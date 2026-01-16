@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Exam Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+    <div class="top-bar">
+        <h2>Online Exam</h2>
+        <button id="toggleMode">🌙</button>
+    </div>
+    <div class="login-box">
+        <h1>Login</h1>
+        <input id="name" placeholder="Enter Name">
+        <input id="class" placeholder="Enter Class">
+        <select id="time">
+            <option value="5">5 Minutes</option>
+            <option value="10">10 Minutes</option>
+            <option value="15">15 Minutes</option>
+            <option value="20">20 Minutes</option>
+        </select>
+        <button onclick="startExam()">Start Exam</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

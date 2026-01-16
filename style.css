@@ -1,0 +1,48 @@
+body {
+    margin: 0; font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh; background: #f1f5f9;
+}
+.light { background: #f1f5f9; color: #1e293b; }
+.dark { background: #0f172a; color: #f8fafc; }
+
+.login-box {
+    background: #1e293b; padding: 25px; border-radius: 12px;
+    width: 400px; text-align: center; color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+#options-container {
+    display: flex; flex-direction: column; gap: 12px; margin-top: 20px;
+}
+
+.option-card {
+    display: flex; align-items: center; background: #334155;
+    padding: 12px 15px; border-radius: 8px; cursor: pointer;
+    border: 2px solid transparent; transition: 0.2s;
+}
+
+.option-card:hover { background: #475569; border-color: #22c55e; }
+
+/* Radio button dot fix */
+.option-card input[type="radio"] {
+    width: 20px !important; height: 20px !important;
+    margin-right: 15px !important; flex-shrink: 0;
+    accent-color: #22c55e;
+}
+
+.option-card span {
+    font-size: 16px; color: white; text-align: left;
+    white-space: pre-wrap; /* Symbols ke liye space maintain rakhega */
+}
+
+button {
+    width: 100%; background: #22c55e; color: white; border: none;
+    padding: 12px; margin-top: 20px; border-radius: 8px;
+    font-weight: bold; cursor: pointer;
+}
+
+.top-bar {
+    position: absolute; top: 0; left: 0; right: 0; padding: 15px 25px;
+    display: flex; justify-content: space-between; font-weight: bold;
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Online Exam</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+    <div class="top-bar">
+        <span id="student"></span>
+        <span id="timer">00:00</span>
+    </div>
+
+    <div class="login-box">
+        <h2 id="question">Loading...</h2>
+        <div id="options-container"></div>
+        <button onclick="nextQuestion()">Next</button>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwETHKplNLxJ97KE33JiRSlKKOZD9MqvJ41zKT0sY3MhlHHJvBM_vme7LybHCTiMk6Q0w/exec";
+        
+        const name = localStorage.getItem("studentName") || "Guest";
+        const cls = localStorage.getItem("studentClass") || "-";
+        const time = parseInt(localStorage.getItem("examTime")) || 5;
+        document.getElementById("student").innerText = `${name} | ${cls}`;
+
+        let questions = []; let answers = []; let index = 0;
+        const limit = { 5: 20, 10: 40, 15: 60, 20: 80 }[time] || 20;
+
+        fetch(API_URL).then(res => res.json()).then(data => {
+            questions = data.sort(() => Math.random() - 0.5).slice(0, limit);
+            loadQuestion();
+        });
+
+        function loadQuestion() {
+            const q = questions[index];
+            // innerText use karne se tags text ki tarah dikhenge, code ki tarah nahi
+            document.getElementById("question").innerText = `Q${index + 1}. ${q.question}`;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = ""; // Clear old options
+
+            ["a", "b", "c", "d"].forEach(opt => {
+                const label = document.createElement("label");
+                label.className = "option-card";
+                
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = "opt";
+                radio.value = opt;
+
+                const textSpan = document.createElement("span");
+                textSpan.innerText = q[opt]; // SAFE: Symbols ko handle karega
+
+                label.appendChild(radio);
+                label.appendChild(textSpan);
+                container.appendChild(label);
+            });
+        }
+
+        function nextQuestion() {
+            const selected = document.querySelector("input[name='opt']:checked");
+            if (!selected) return alert("Please select an option");
+            answers[index] = selected.value;
+            index++;
+            index < questions.length ? loadQuestion() : finishExam("Completed");
+        }
+
+        function finishExam(reason) {
+            localStorage.setItem("answers", JSON.stringify(answers));
+            localStorage.setItem("questions", JSON.stringify(questions));
+            localStorage.setItem("reason", reason);
+            window.location.href = "result.html";
+        }
+
+        let seconds = time * 60;
+        setInterval(() => {
+            let m = Math.floor(seconds / 60); let s = seconds % 60;
+            document.getElementById("timer").innerText = `${m}:${s < 10 ? '0' + s : s}`;
+            if (seconds-- <= 0) finishExam("Time Over");
+        }, 1000);
+    </script>
+</body>
+</html>

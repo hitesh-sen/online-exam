@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result - Online Exam</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .result-card { text-align: left; margin-top: 20px; }
+        .result-line { 
+            display: flex; justify-content: space-between; 
+            padding: 8px 0; border-bottom: 1px solid #334155; 
+        }
+        .status-pass { color: #22c55e; font-weight: bold; }
+        .status-fail { color: #ef4444; font-weight: bold; }
+    </style>
+</head>
+<body class="light">
+
+<div class="login-box" style="width: 400px;">
+    <h1>Score Card</h1>
+    <h3 id="student-info" style="color: #94a3b8;"></h3>
+    <hr style="border: 0; border-top: 1px solid #334155; margin: 20px 0;">
+
+    <div class="result-card">
+        <div class="result-line"><span>Score:</span> <span id="score">0</span></div>
+        <div class="result-line"><span>Attempted:</span> <span id="attempted">0</span></div>
+        <div class="result-line"><span>Percentage:</span> <span id="percentage">0%</span></div>
+        <div class="result-line"><span>Status:</span> <span id="status">-</span></div>
+        <div class="result-line"><span>Reason:</span> <span id="reason">Normal</span></div>
+    </div>
+
+    <button onclick="location.href='index.html'" style="margin-top: 30px;">Try Again</button>
+</div>
+
+<script>
+    // 1. Data load karein
+    const name = localStorage.getItem("studentName") || "Unknown";
+    const cls = localStorage.getItem("studentClass") || "N/A";
+    const answers = JSON.parse(localStorage.getItem("answers")) || [];
+    const questions = JSON.parse(localStorage.getItem("questions")) || [];
+    const reason = localStorage.getItem("reason") || "Normal Submit";
+
+    document.getElementById("student-info").innerText = `${name} | Class: ${cls}`;
+
+    // 2. Score Calculation
+    let score = 0;
+    let attempted = 0;
+
+    questions.forEach((q, i) => {
+        if (answers[i]) {
+            attempted++;
+            // Check correct answer based on spreadsheet mapping (a, b, c, d)
+            if (answers[i] === q.correct) {
+                score++;
+            }
+        }
+    });
+
+    const total = questions.length;
+    const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+    const finalStatus = percent >= 50 ? "PASS 🎉" : "FAIL ❌";
+
+    // 3. UI Update karein
+    document.getElementById("score").innerText = `${score} / ${total}`;
+    document.getElementById("attempted").innerText = `${attempted} / ${total}`;
+    document.getElementById("percentage").innerText = `${percent}%`;
+    document.getElementById("status").innerText = finalStatus;
+    document.getElementById("status").className = percent >= 50 ? "status-pass" : "status-fail";
+    document.getElementById("reason").innerText = reason;
+
+    // 4. Google Sheets par Result bhejein
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwETHKplNLxJ97KE33JiRSlKKOZD9MqvJ41zKT0sY3MhlHHJvBM_vme7LybHCTiMk6Q0w/exec";
+
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors", // Crucial for Google Apps Script POST
+        cache: "no-cache",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: name,
+            class: cls,
+            score: score,
+            total: total,
+            attempted: attempted,
+            percentage: percent,
+            status: percent >= 50 ? "PASS" : "FAIL",
+            reason: reason
+        })
+    }).then(() => console.log("Data sent to sheet"))
+      .catch(err => console.error("Error sending data:", err));
+
+</script>
+
+</body>
+</html>
