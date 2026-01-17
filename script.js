@@ -16,26 +16,18 @@ window.onload = () => {
     const savedClass = localStorage.getItem("studentClass");
     const savedEmail = localStorage.getItem("studentEmail");
 
-    if (savedName && savedClass) {
-        if(document.getElementById("name")) document.getElementById("name").value = savedName;
-        if(document.getElementById("class")) document.getElementById("class").value = savedClass;
-        if(document.getElementById("email")) document.getElementById("email").value = savedEmail;
-    }
+    if (savedName) document.getElementById("name").value = savedName;
+    if (savedClass) document.getElementById("class").value = savedClass;
+    if (savedEmail) document.getElementById("email").value = savedEmail;
 };
 
 function sendOTP() {
-    const nameInput = document.getElementById("name");
-    const emailInput = document.getElementById("email");
-    const classInput = document.getElementById("class");
-
-    if (!nameInput || !emailInput || !classInput) return;
-
-    const name = nameInput.value.trim();
-    const email = emailInput.value.trim();
-    const cls = classInput.value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const cls = document.getElementById("class").value;
 
     if (!name || !email || !cls) {
-        alert("Please enter Name, Email and Select Class!");
+        alert("Pehle Name, Email aur Class select karein!");
         return;
     }
 
@@ -48,12 +40,12 @@ function sendOTP() {
     };
 
     emailjs.send('service_p4n3jt9', 'template_kxgdizu', templateParams)
-        .then(function(response) {
-           alert("OTP has been sent to your email!");
+        .then(function() {
+           alert("OTP aapke Email par bhej diya gaya hai!");
            document.getElementById("otp-section").style.display = "block";
            document.getElementById("send-otp-btn").style.display = "none";
         }, function(error) {
-           alert("Email Error: " + JSON.stringify(error));
+           alert("Email Error: Permission check karein (Error 412).");
         });
 }
 
@@ -61,16 +53,14 @@ function verifyOTPAndStart() {
     const otpInput = document.getElementById("otp-input");
     if (!otpInput) return;
 
-    const userOTP = otpInput.value.trim();
-
-    if (userOTP == generatedOTP && generatedOTP !== null) {
+    if (otpInput.value.trim() == generatedOTP && generatedOTP !== null) {
         localStorage.setItem("studentName", document.getElementById("name").value.trim());
         localStorage.setItem("studentClass", document.getElementById("class").value);
         localStorage.setItem("studentEmail", document.getElementById("email").value.trim());
-
+        
         alert("Login Successful!");
         window.location.href = "exam.html";
     } else {
-        alert("Invalid OTP! Please check again.");
+        alert("Galat OTP!");
     }
 }
