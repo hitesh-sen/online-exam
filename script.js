@@ -35,7 +35,7 @@ function sendOTP() {
 
     const templateParams = {
         to_name: name,
-        email: to_email, 
+        email: email, 
         otp: generatedOTP
     };
 
