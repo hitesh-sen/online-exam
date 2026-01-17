@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Result - Online Exam</title>
     <link rel="stylesheet" href="style.css">
     <style>
@@ -11,11 +13,29 @@
         }
         .status-pass { color: #22c55e; font-weight: bold; }
         .status-fail { color: #ef4444; font-weight: bold; }
+
+        /* Review Section Styling */
+        #review-section { margin-top: 40px; text-align: left; }
+        .review-card {
+            background: #1e293b; padding: 15px; border-radius: 8px;
+            margin-bottom: 15px; border-left: 5px solid #ef4444;
+        }
+        .review-card.correct { border-left-color: #22c55e; }
+        .question-text { font-weight: bold; margin-bottom: 10px; color: #f8fafc; }
+        .ans-row { font-size: 14px; margin: 4px 0; }
+        .your-ans { color: #94a3b8; }
+        .correct-ans { color: #22c55e; font-weight: bold; }
+        
+        /* Mobile Responsive Header Fix */
+        @media (max-width: 500px) {
+            .login-box { width: 90% !important; padding: 20px; }
+            h1 { font-size: 24px; }
+        }
     </style>
 </head>
 <body class="light">
 
-<div class="login-box" style="width: 400px;">
+<div class="login-box" style="width: 500px; margin-bottom: 50px;">
     <h1>Score Card</h1>
     <h3 id="student-info" style="color: #94a3b8;"></h3>
     <hr style="border: 0; border-top: 1px solid #334155; margin: 20px 0;">
@@ -28,7 +48,12 @@
         <div class="result-line"><span>Reason:</span> <span id="reason">Normal</span></div>
     </div>
 
-    <button onclick="location.href='index.html'" style="margin-top: 30px;">Try Again</button>
+    <div id="review-section">
+        <h2>Answer Review</h2>
+        <div id="review-container"></div>
+    </div>
+
+    <button onclick="location.href='index.html'" style="margin-top: 30px; width: 100%;">Try Again / Home</button>
 </div>
 
 <script>
@@ -41,25 +66,41 @@
 
     document.getElementById("student-info").innerText = `${name} | Class: ${cls}`;
 
-    // 2. Score Calculation
+    // 2. Score Calculation & Review Logic
     let score = 0;
     let attempted = 0;
+    const reviewContainer = document.getElementById("review-container");
 
     questions.forEach((q, i) => {
-        if (answers[i]) {
+        const userAns = answers[i];
+        const isCorrect = userAns === q.correct;
+        
+        if (userAns) {
             attempted++;
-            // Check correct answer based on spreadsheet mapping (a, b, c, d)
-            if (answers[i] === q.correct) {
-                score++;
-            }
+            if (isCorrect) score++;
         }
+
+        // Review UI generate karein
+        const card = document.createElement("div");
+        card.className = `review-card ${isCorrect ? 'correct' : ''}`;
+        
+        // Option text nikalne ke liye logic (e.g., q['a'])
+        const userAnsText = userAns ? q[userAns] : "Not Attempted";
+        const correctAnsText = q[q.correct];
+
+        card.innerHTML = `
+            <div class="question-text">Q${i+1}. ${q.question}</div>
+            <div class="ans-row your-ans">Your Answer: ${userAnsText} ${isCorrect ? '✅' : '❌'}</div>
+            ${!isCorrect ? `<div class="ans-row correct-ans">Correct Answer: ${correctAnsText}</div>` : ''}
+        `;
+        reviewContainer.appendChild(card);
     });
 
     const total = questions.length;
     const percent = total > 0 ? Math.round((score / total) * 100) : 0;
     const finalStatus = percent >= 50 ? "PASS 🎉" : "FAIL ❌";
 
-    // 3. UI Update karein
+    // 3. UI Update
     document.getElementById("score").innerText = `${score} / ${total}`;
     document.getElementById("attempted").innerText = `${attempted} / ${total}`;
     document.getElementById("percentage").innerText = `${percent}%`;
@@ -72,24 +113,17 @@
 
     fetch(WEB_APP_URL, {
         method: "POST",
-        mode: "no-cors", // Crucial for Google Apps Script POST
-        cache: "no-cache",
+        mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             name: name,
-            class: cls,
+            studentClass: cls, // Apps Script ke doPost se match hona chahiye
             score: score,
-            total: total,
-            attempted: attempted,
-            percentage: percent,
-            status: percent >= 50 ? "PASS" : "FAIL",
-            reason: reason
+            total: total
         })
-    }).then(() => console.log("Data sent to sheet"))
-      .catch(err => console.error("Error sending data:", err));
+    }).then(() => console.log("Data saved to Google Sheet"));
 
 </script>
 
 </body>
-
 </html>
