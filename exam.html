@@ -80,11 +80,13 @@
             }
         }
 
-        function finish() {
-            // Data ko localStorage mein save karke result page par bhejna
-            localStorage.setItem("reviewData", JSON.stringify(userChoices));
-            window.location.href = "result.html";
-        }
+       function finish() {
+    console.log("Saving data...", userChoices); 
+    localStorage.setItem("reviewData", JSON.stringify(userChoices));
+    setTimeout(() => {
+        window.location.href = "result.html";
+    }, 500); 
+}
 
         // Timer Logic (5 Minutes)
         let sec = 300; 
@@ -99,3 +101,4 @@
     </script>
 </body>
 </html>
+
