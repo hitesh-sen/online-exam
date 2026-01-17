@@ -1,65 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result - Online Exam</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .result-card { text-align: left; margin-top: 20px; background: #1e293b; padding: 20px; border-radius: 10px; color: white; }
-        .result-line { 
-            display: flex; justify-content: space-between; 
-            padding: 10px 0; border-bottom: 1px solid #334155; 
-        }
-        .status-pass { color: #22c55e; font-weight: bold; }
-        .status-fail { color: #ef4444; font-weight: bold; }
-
-        #review-section { margin-top: 30px; text-align: left; }
-        .review-card {
-            background: #0f172a; padding: 15px; border-radius: 8px;
-            margin-bottom: 12px; border-left: 5px solid #ef4444;
-        }
-        .review-card.correct { border-left-color: #22c55e; }
-        .question-text { font-weight: bold; margin-bottom: 8px; color: #f8fafc; white-space: pre-wrap; }
-        .ans-row { font-size: 14px; margin: 4px 0; white-space: pre-wrap; }
-        .correct-ans { color: #22c55e; font-weight: bold; margin-top: 5px; }
-    </style>
-</head>
-<body class="light">
-
-<div class="login-box" style="width: 90%; max-width: 600px; margin: 40px auto; display: block !important;">
-    <h1>Score Card</h1>
-    <h3 id="student-info" style="color: #94a3b8;"></h3>
-    
-    <div class="result-card" id="scorecard-box">
-        <div class="result-line"><span>Total Questions:</span> <span id="total-qs">0</span></div>
-        <div class="result-line"><span>Score:</span> <span id="score">0</span></div>
-        <div class="result-line"><span>Percentage:</span> <span id="percentage">0%</span></div>
-        <div class="result-line"><span>Status:</span> <span id="status">-</span></div>
-    </div>
-
-    <div id="review-section">
-        <h2 style="border-bottom: 2px solid #334155; padding-bottom: 10px; color: white;">Answer Sheet Review</h2>
-        <div id="review-container"></div>
-    </div>
-
-    <button onclick="location.href='index.html'" style="margin-top: 30px; width: 100%;">Back to Home</button>
-</div>
-
 <script>
-    // 1. Data load karein (LocalStorage keys check karein)
     const name = localStorage.getItem("studentName") || "Student";
     const cls = localStorage.getItem("studentClass") || "-";
-    // userChoices naam use kar rahe hain jo exam.html se aa raha hai
+    const email = localStorage.getItem("studentEmail") || "N/A";
     const reviewData = JSON.parse(localStorage.getItem("reviewData")) || []; 
-
-    document.getElementById("student-info").textContent = `${name} | Class: ${cls}`;
 
     let score = 0;
     const total = reviewData.length;
     const reviewContainer = document.getElementById("review-container");
 
-    // 2. Score aur Review Table logic
     reviewData.forEach((item, i) => {
         const isCorrect = item.selected === item.correct;
         if (isCorrect) score++;
@@ -67,48 +15,34 @@
         const card = document.createElement("div");
         card.className = `review-card ${isCorrect ? 'correct' : ''}`;
         
-        const selectedText = item.options[item.selected] || "Not Answered";
-        const correctText = item.options[item.correct];
-
-        // textContent use kiya hai taaki HTML tags as text dikhein
-        const qDiv = document.createElement("div");
-        qDiv.className = "question-text";
-        qDiv.textContent = `Q${i+1}. ${item.question}`;
-
-        const yourAnsDiv = document.createElement("div");
-        yourAnsDiv.className = "ans-row";
-        yourAnsDiv.style.color = isCorrect ? '#22c55e' : '#ef4444';
-        yourAnsDiv.textContent = `Your Answer: ${selectedText} ${isCorrect ? '✅' : '❌'}`;
-
-        card.appendChild(qDiv);
-        card.appendChild(yourAnsDiv);
-
-        if (!isCorrect) {
-            const correctAnsDiv = document.createElement("div");
-            correctAnsDiv.className = "ans-row correct-ans";
-            correctAnsDiv.textContent = `Correct Answer: ${correctText}`;
-            card.appendChild(correctAnsDiv);
-        }
-        
+        card.innerHTML = `
+            <div class="question-text">Q${i+1}. ${item.question}</div>
+            <div class="ans-row" style="color: ${isCorrect ? '#22c55e' : '#ef4444'}">
+                Your Answer: ${item.options[item.selected] || "Not Answered"} ${isCorrect ? '✅' : '❌'}
+            </div>
+            ${!isCorrect ? `<div class="ans-row correct-ans">Correct: ${item.options[item.correct]}</div>` : ''}
+        `;
         reviewContainer.appendChild(card);
     });
 
-    // 3. Scorecard update
     const percent = total > 0 ? Math.round((score / total) * 100) : 0;
     document.getElementById("total-qs").textContent = total;
     document.getElementById("score").textContent = `${score} / ${total}`;
     document.getElementById("percentage").textContent = `${percent}%`;
     document.getElementById("status").textContent = percent >= 50 ? "PASS 🎉" : "FAIL ❌";
-    document.getElementById("status").className = percent >= 50 ? "status-pass" : "status-fail";
 
-    // 4. Google Sheets Sync
+    // Google Sheets Sync
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec";
     fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
-        body: JSON.stringify({ name: name, studentClass: cls, score: score, total: total })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            name: name, 
+            studentClass: cls, 
+            email: email,
+            score: score, 
+            total: total 
+        })
     });
 </script>
-
-</body>
-</html>
