@@ -2,39 +2,55 @@ body {
     margin: 0; 
     font-family: 'Segoe UI', Arial, sans-serif;
     display: flex; 
-    flex-direction: column; /* Isse header upar aur content niche rahega */
+    flex-direction: column;
     align-items: center;
-    min-height: 100vh; /* Fixed height ki jagah min-height taki scroll ho sake */
+    justify-content: center; /* Content ko center karne ke liye */
+    min-height: 100vh;
     background: #f1f5f9;
-    padding-top: 70px; /* Header ke liye jagah */
+    padding: 80px 15px 20px 15px; /* Top padding header ke liye, baki sides ke liye */
+    box-sizing: border-box; /* Padding ko width ke andar count karega */
 }
 
 .light { background: #f1f5f9; color: #1e293b; }
 .dark { background: #0f172a; color: #f8fafc; }
 
-/* Top Bar Fix */
+/* Top Bar Fix - Responsive for Mobile.png] */
 .top-bar {
-    position: fixed; /* Absolute ki jagah fixed taki ye hamesha upar dikhe */
+    position: fixed;
     top: 0; left: 0; right: 0; 
-    padding: 15px 25px;
+    padding: 10px 20px;
     display: flex; 
     justify-content: space-between; 
-    font-weight: bold;
-    background: inherit; /* Body ka color lega */
+    align-items: center;
+    background: #22c55e; /* Green background as per your screenshot */
+    color: white;
     z-index: 1000;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .login-box {
     background: #1e293b; 
     padding: 25px; 
     border-radius: 12px;
-    width: 90%; 
-    max-width: 600px; /* Responsive width */
+    width: 100%; /* Mobile par poori width */
+    max-width: 450px; /* Tablet/PC par 450px se bada nahi hoga */
     text-align: center; 
     color: white;
     box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    margin-bottom: 30px; /* Niche se thodi jagah */
+    box-sizing: border-box; /* Box ko screen se bahar jane se rokega */
+}
+
+/* Inputs and Select Fix.png] */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #f8fafc;
+    color: #1e293b;
+    box-sizing: border-box;
+    font-size: 16px;
 }
 
 /* Review Section for Result Page */
@@ -46,7 +62,6 @@ body {
     margin-top: 15px;
     border-left: 5px solid #ef4444;
 }
-
 .review-card.correct { border-left-color: #22c55e; }
 
 /* Question and Options Logic */
@@ -60,15 +75,14 @@ body {
     border: 2px solid transparent; transition: 0.2s;
     text-align: left;
 }
-
 .option-card:hover { background: #475569; border-color: #22c55e; }
 
-/* Special Characters/Tags Support */
+/* Special Characters/Tags Support.png] */
 .option-card span, .question-text, .ans-row {
     font-size: 16px; 
     color: white; 
-    white-space: pre-wrap; /* Symbols ke liye space maintain rakhega */
-    word-break: break-all; /* Lambe code tags ko break karega */
+    white-space: pre-wrap; 
+    word-break: break-word; /* Tags ko sahi se wrap karega */
 }
 
 /* Radio button dot fix */
@@ -81,14 +95,18 @@ body {
 button {
     width: 100%; background: #22c55e; color: white; border: none;
     padding: 12px; margin-top: 20px; border-radius: 8px;
-    font-weight: bold; cursor: pointer;
-    font-size: 16px;
+    font-weight: bold; cursor: pointer; font-size: 16px;
 }
-
 button:hover { background: #1a9e4b; }
 
-/* Result Line for Scorecard */
 .result-line {
     display: flex; justify-content: space-between;
     padding: 10px 0; border-bottom: 1px solid #475569;
+}
+
+/* Mobile Specific Tweaks.png] */
+@media (max-width: 480px) {
+    .top-bar h2 { font-size: 16px; }
+    .login-box { padding: 20px; }
+    h1 { font-size: 24px; }
 }
