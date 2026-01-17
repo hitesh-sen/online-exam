@@ -1,9 +1,6 @@
 let mode = "light";
 let generatedOTP = null;
 
-(function(){
-    emailjs.init("dNirsJkwieq53_oF4"); 
-})();
 
 document.getElementById("toggleMode").onclick = () => {
     mode = (mode === "light") ? "dark" : "light";
@@ -64,4 +61,5 @@ function verifyOTPAndStart() {
         alert("Galat OTP!");
     }
 }
+
 
