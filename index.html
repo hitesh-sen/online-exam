@@ -12,24 +12,31 @@
         <button id="toggleMode" style="width: auto; margin: 0; padding: 5px 10px;">🌙</button>
     </div>
 
-    <div class="login-box">
-        <h1>Login</h1>
-        <div style="display: flex; flex-direction: column; gap: 15px;">
-            <input id="name" type="text" placeholder="Enter Full Name">
-            <input id="class" type="text" placeholder="Enter Class (e.g. 10th)">
-            
-            <div style="text-align: left; font-size: 0.9rem; margin-bottom: -10px;">Select Duration:</div>
-            <select id="time">
-                <option value="5">5 Minutes</option>
-                <option value="10">10 Minutes</option>
-                <option value="15">15 Minutes</option>
-                <option value="20">20 Minutes</option>
-            </select>
-            
-            <button onclick="startExam()">Start Exam</button>
+   <div class="login-box">
+    <h1>Student Login</h1>
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+        <input id="name" type="text" placeholder="Full Name">
+        <input id="email" type="email" placeholder="Email Address (for OTP)">
+        
+        <select id="class">
+            <option value="">Select Your Class</option>
+            <option value="12th">12th Standard</option>
+            <option value="BCA">BCA</option>
+            <option value="BTech">B.Tech</option>
+            <option value="MCA">MCA</option>
+            <option value="Other">Other Higher Education</option>
+        </select>
+
+        <button id="send-otp-btn" onclick="sendOTP()">Send OTP</button>
+
+        <div id="otp-section" style="display:none;">
+            <input id="otp-input" type="text" placeholder="Enter 6-Digit OTP">
+            <button onclick="verifyOTPAndStart()">Verify & Start Exam</button>
         </div>
     </div>
+</div>
 
     <script src="script.js"></script>
 </body>
 </html>
+
