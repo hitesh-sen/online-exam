@@ -35,7 +35,7 @@ function sendOTP() {
 
     const templateParams = {
         to_name: name,
-        email: email, 
+        email: to_email, 
         otp: generatedOTP
     };
 
@@ -64,3 +64,4 @@ function verifyOTPAndStart() {
         alert("Galat OTP!");
     }
 }
+
