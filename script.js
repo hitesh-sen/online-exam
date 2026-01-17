@@ -1,6 +1,10 @@
 let mode = "light";
 let generatedOTP = null;
 
+(function(){
+    emailjs.init("dNirsJkwieq53_oF4"); 
+})();
+
 document.getElementById("toggleMode").onclick = () => {
     mode = (mode === "light") ? "dark" : "light";
     document.body.className = mode;
@@ -16,7 +20,6 @@ window.onload = () => {
         document.getElementById("name").value = savedName;
         document.getElementById("class").value = savedClass;
         if(document.getElementById("email")) document.getElementById("email").value = savedEmail;
-        console.log("Welcome back student data loaded.");
     }
 };
 
@@ -31,26 +34,34 @@ function sendOTP() {
     }
 
     generatedOTP = Math.floor(100000 + Math.random() * 900000);
-    
-    alert(`Verification Code: ${generatedOTP}\nKripya ise enter karein.`);
 
-    document.getElementById("otp-section").style.display = "block";
-    document.querySelector("button[onclick='sendOTP()']").style.display = "none";
+    const templateParams = {
+        to_name: name,
+        email: email, 
+        otp: generatedOTP
+    };
+
+    emailjs.send('service_p4n3jt9', 'template_kxgdizu', templateParams)
+        .then(function(response) {
+           alert("OTP has been sent to your email!");
+           document.getElementById("otp-section").style.display = "block";
+           document.getElementById("send-otp-btn").style.display = "none";
+        }, function(error) {
+           alert("Error: " + JSON.stringify(error));
+        });
 }
 
 function verifyOTPAndStart() {
     const userOTP = document.getElementById("otp-input").value.trim();
-    const time = document.getElementById("time").value;
 
     if (userOTP == generatedOTP) {
         localStorage.setItem("studentName", document.getElementById("name").value.trim());
         localStorage.setItem("studentClass", document.getElementById("class").value);
         localStorage.setItem("studentEmail", document.getElementById("email").value.trim());
-        localStorage.setItem("examTime", time);
 
-        alert("Login Successful! Best of luck for your exam.");
+        alert("Login Successful!");
         window.location.href = "exam.html";
     } else {
-        alert("Galat OTP! Kripya sahi code dalein.");
+        alert("Galat OTP!");
     }
 }
