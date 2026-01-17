@@ -17,19 +17,25 @@ window.onload = () => {
     const savedEmail = localStorage.getItem("studentEmail");
 
     if (savedName && savedClass) {
-        document.getElementById("name").value = savedName;
-        document.getElementById("class").value = savedClass;
+        if(document.getElementById("name")) document.getElementById("name").value = savedName;
+        if(document.getElementById("class")) document.getElementById("class").value = savedClass;
         if(document.getElementById("email")) document.getElementById("email").value = savedEmail;
     }
 };
 
 function sendOTP() {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const cls = document.getElementById("class").value;
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const classInput = document.getElementById("class");
+
+    if (!nameInput || !emailInput || !classInput) return;
+
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const cls = classInput.value;
 
     if (!name || !email || !cls) {
-        alert("Sahi details bharein! Name, Email aur Class zaruri hai.");
+        alert("Please enter Name, Email and Select Class!");
         return;
     }
 
@@ -47,14 +53,17 @@ function sendOTP() {
            document.getElementById("otp-section").style.display = "block";
            document.getElementById("send-otp-btn").style.display = "none";
         }, function(error) {
-           alert("Error: " + JSON.stringify(error));
+           alert("Email Error: " + JSON.stringify(error));
         });
 }
 
 function verifyOTPAndStart() {
-    const userOTP = document.getElementById("otp-input").value.trim();
+    const otpInput = document.getElementById("otp-input");
+    if (!otpInput) return;
 
-    if (userOTP == generatedOTP) {
+    const userOTP = otpInput.value.trim();
+
+    if (userOTP == generatedOTP && generatedOTP !== null) {
         localStorage.setItem("studentName", document.getElementById("name").value.trim());
         localStorage.setItem("studentClass", document.getElementById("class").value);
         localStorage.setItem("studentEmail", document.getElementById("email").value.trim());
@@ -62,6 +71,6 @@ function verifyOTPAndStart() {
         alert("Login Successful!");
         window.location.href = "exam.html";
     } else {
-        alert("Galat OTP!");
+        alert("Invalid OTP! Please check again.");
     }
 }
