@@ -4,17 +4,19 @@ body {
     display: flex; 
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Content ko center karne ke liye */
+    justify-content: center;
     min-height: 100vh;
     background: #f1f5f9;
-    padding: 80px 15px 20px 15px; /* Top padding header ke liye, baki sides ke liye */
-    box-sizing: border-box; /* Padding ko width ke andar count karega */
+    padding: 80px 15px 40px 15px; 
+    box-sizing: border-box;
+    transition: background 0.3s, color 0.3s;
 }
 
+/* Light & Dark Modes */
 .light { background: #f1f5f9; color: #1e293b; }
 .dark { background: #0f172a; color: #f8fafc; }
 
-/* Top Bar Fix - Responsive for Mobile.png] */
+/* Top Bar Styling */
 .top-bar {
     position: fixed;
     top: 0; left: 0; right: 0; 
@@ -22,91 +24,106 @@ body {
     display: flex; 
     justify-content: space-between; 
     align-items: center;
-    background: #22c55e; /* Green background as per your screenshot */
+    background: #22c55e;
     color: white;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+.top-bar h2 { margin: 0; font-size: 1.2rem; }
+
+/* Login Box Fixes.png] */
 .login-box {
     background: #1e293b; 
-    padding: 25px; 
-    border-radius: 12px;
-    width: 100%; /* Mobile par poori width */
-    max-width: 450px; /* Tablet/PC par 450px se bada nahi hoga */
+    padding: 30px; 
+    border-radius: 16px;
+    width: 100%; 
+    max-width: 420px; 
     text-align: center; 
     color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    box-sizing: border-box; /* Box ko screen se bahar jane se rokega */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    box-sizing: border-box;
 }
 
-/* Inputs and Select Fix.png] */
+.login-box h1 { margin-top: 0; font-size: 2rem; color: #22c55e; }
+
+/* Input, Select & OTP Section Styling */
 input, select {
     width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 8px;
+    padding: 14px;
+    margin-top: 12px;
+    border-radius: 10px;
     border: 1px solid #334155;
     background: #f8fafc;
     color: #1e293b;
     box-sizing: border-box;
     font-size: 16px;
+    transition: border-color 0.3s;
 }
 
-/* Review Section for Result Page */
+input:focus, select:focus {
+    outline: none;
+    border-color: #22c55e;
+}
+
+/* Specific styling for the Class Dropdown */
+select {
+    cursor: pointer;
+    appearance: none; /* Default arrow hatane ke liye agar customized chahiye */
+}
+
+/* OTP Section Animation */
+#otp-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #334155;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Buttons */
+button {
+    width: 100%; 
+    background: #22c55e; 
+    color: white; 
+    border: none;
+    padding: 14px; 
+    margin-top: 20px; 
+    border-radius: 10px;
+    font-weight: bold; 
+    cursor: pointer; 
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(34, 197, 94, 0.2);
+    transition: transform 0.2s, background 0.2s;
+}
+
+button:hover { 
+    background: #1a9e4b; 
+    transform: translateY(-2px);
+}
+
+button:active { transform: translateY(0); }
+
+/* Review & Result Logic */
 .review-card {
     text-align: left;
     background: #334155;
     padding: 15px;
-    border-radius: 10px;
+    border-radius: 12px;
     margin-top: 15px;
-    border-left: 5px solid #ef4444;
+    border-left: 6px solid #ef4444;
 }
 .review-card.correct { border-left-color: #22c55e; }
 
-/* Question and Options Logic */
-#options-container {
-    display: flex; flex-direction: column; gap: 12px; margin-top: 20px;
-}
-
-.option-card {
-    display: flex; align-items: center; background: #334155;
-    padding: 12px 15px; border-radius: 8px; cursor: pointer;
-    border: 2px solid transparent; transition: 0.2s;
-    text-align: left;
-}
-.option-card:hover { background: #475569; border-color: #22c55e; }
-
-/* Special Characters/Tags Support.png] */
-.option-card span, .question-text, .ans-row {
-    font-size: 16px; 
-    color: white; 
-    white-space: pre-wrap; 
-    word-break: break-word; /* Tags ko sahi se wrap karega */
-}
-
-/* Radio button dot fix */
-.option-card input[type="radio"] {
-    width: 20px !important; height: 20px !important;
-    margin-right: 15px !important; flex-shrink: 0;
-    accent-color: #22c55e;
-}
-
-button {
-    width: 100%; background: #22c55e; color: white; border: none;
-    padding: 12px; margin-top: 20px; border-radius: 8px;
-    font-weight: bold; cursor: pointer; font-size: 16px;
-}
-button:hover { background: #1a9e4b; }
-
-.result-line {
-    display: flex; justify-content: space-between;
-    padding: 10px 0; border-bottom: 1px solid #475569;
-}
-
-/* Mobile Specific Tweaks.png] */
+/* Mobile Optimization.png] */
 @media (max-width: 480px) {
-    .top-bar h2 { font-size: 16px; }
-    .login-box { padding: 20px; }
-    h1 { font-size: 24px; }
+    body { padding-top: 70px; }
+    .top-bar { padding: 8px 15px; }
+    .top-bar h2 { font-size: 1rem; }
+    .login-box { padding: 25px 20px; border-radius: 12px; }
+    input, select, button { padding: 12px; font-size: 15px; }
 }
