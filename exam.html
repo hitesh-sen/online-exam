@@ -8,66 +8,93 @@
 </head>
 <body class="light">
     <div class="top-bar">
-        <div><b id="student"></b> <button onclick="location.href='index.html'" style="width:auto; padding:5px; background:red;">Exit</button></div>
+        <div><b id="student"></b> <button onclick="location.href='index.html'" style="width:auto; padding:5px; background:red; color:white; border:none; border-radius:5px; cursor:pointer;">Exit</button></div>
         <span id="timer">00:00</span>
     </div>
 
-    <div class="login-box" style="max-width: 600px;">
-        <h2 id="question">Loading...</h2>
+    <div class="login-box" style="max-width: 600px; margin: 20px auto;">
+        <h2 id="question">Loading Questions...</h2>
         <div id="options-container"></div>
-        <button id="next-btn" onclick="nextQuestion()" style="display:none;">Next Question</button>
+        <button id="next-btn" onclick="nextQuestion()" style="display:none; width: 100%; padding: 12px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Next Question</button>
     </div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec";
-        const name = localStorage.getItem("studentName");
-        const cls = localStorage.getItem("studentClass");
+        const name = localStorage.getItem("studentName") || "Guest";
+        const cls = localStorage.getItem("studentClass") || "-";
         document.getElementById("student").innerText = `${name} | ${cls}`;
 
         let questions = [], userChoices = [], index = 0;
 
+        // API se data mangwana
         fetch(API_URL).then(res => res.json()).then(data => {
+            // Randomly 10 questions uthana
             questions = data.sort(() => Math.random() - 0.5).slice(0, 10);
             document.getElementById("next-btn").style.display = "block";
             loadQuestion();
+        }).catch(err => {
+            document.getElementById("question").innerText = "Error loading questions. Please check connection.";
         });
 
         function loadQuestion() {
+            if (index >= questions.length) return; // Safety check
+            
             const q = questions[index];
             document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
             const container = document.getElementById('options-container');
             container.innerHTML = ""; 
+            
             ["a", "b", "c", "d"].forEach(opt => {
-                container.innerHTML += `<label class="option-card" style="display:block; margin:10px; padding:10px; border:1px solid #ccc; border-radius:8px;">
-                    <input type="radio" name="opt" value="${opt}"> ${q[opt]}
-                </label>`;
+                container.innerHTML += `
+                    <label class="option-card" style="display:block; margin:10px 0; padding:12px; border:1px solid #ccc; border-radius:8px; cursor:pointer; text-align:left;">
+                        <input type="radio" name="opt" value="${opt}" style="margin-right:10px;"> ${q[opt]}
+                    </label>`;
             });
+            
+            // Button text change agar last question hai
+            if (index === questions.length - 1) {
+                document.getElementById("next-btn").innerText = "Submit Exam";
+            }
         }
 
         function nextQuestion() {
             const sel = document.querySelector("input[name='opt']:checked");
-            if (!sel) return alert("Select answer!");
+            if (!sel) return alert("Please select an answer!");
+
+            // Current question ka data save karna
+            const currentQ = questions[index];
             userChoices.push({
-                question: questions[index].question,
+                question: currentQ.question,
                 selected: sel.value,
-                correct: questions[index].correct,
-                options: { a: questions[index].a, b: questions[index].b, c: questions[index].c, d: questions[index].d }
+                correct: currentQ.correct,
+                options: { a: currentQ.a, b: currentQ.b, c: currentQ.c, d: currentQ.d }
             });
-            index++;
-            if (index < questions.length) loadQuestion();
-            else finish();
+
+            index++; // Agle sawaal par jana
+
+            // Check: Kya agla sawaal hai?
+            if (index < questions.length) {
+                loadQuestion();
+            } else {
+                finish(); // Agar sawaal khatam, toh finish
+            }
         }
 
         function finish() {
+            // Data ko localStorage mein save karke result page par bhejna
             localStorage.setItem("reviewData", JSON.stringify(userChoices));
             window.location.href = "result.html";
         }
 
-        let sec = 300; // 5 mins
-        setInterval(() => {
+        // Timer Logic (5 Minutes)
+        let sec = 300; 
+        const timerInt = setInterval(() => {
             let m = Math.floor(sec/60), s = sec%60;
             document.getElementById("timer").innerText = `${m}:${s<10?'0'+s:s}`;
-            if (sec-- <= 0) finish();
+            if (sec-- <= 0) {
+                clearInterval(timerInt);
+                finish();
+            }
         }, 1000);
     </script>
 </body>
