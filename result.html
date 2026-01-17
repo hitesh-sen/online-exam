@@ -6,123 +6,104 @@
     <title>Result - Online Exam</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .result-card { text-align: left; margin-top: 20px; }
+        .result-card { text-align: left; margin-top: 20px; background: #1e293b; padding: 20px; border-radius: 10px; }
         .result-line { 
             display: flex; justify-content: space-between; 
-            padding: 8px 0; border-bottom: 1px solid #334155; 
+            padding: 10px 0; border-bottom: 1px solid #334155; 
         }
         .status-pass { color: #22c55e; font-weight: bold; }
         .status-fail { color: #ef4444; font-weight: bold; }
 
-        /* Review Section Styling */
-        #review-section { margin-top: 40px; text-align: left; }
+        #review-section { margin-top: 30px; text-align: left; }
         .review-card {
-            background: #1e293b; padding: 15px; border-radius: 8px;
-            margin-bottom: 15px; border-left: 5px solid #ef4444;
+            background: #0f172a; padding: 15px; border-radius: 8px;
+            margin-bottom: 12px; border-left: 5px solid #ef4444;
         }
         .review-card.correct { border-left-color: #22c55e; }
-        .question-text { font-weight: bold; margin-bottom: 10px; color: #f8fafc; }
+        .question-text { font-weight: bold; margin-bottom: 8px; color: #f8fafc; }
         .ans-row { font-size: 14px; margin: 4px 0; }
-        .your-ans { color: #94a3b8; }
-        .correct-ans { color: #22c55e; font-weight: bold; }
-        
-        /* Mobile Responsive Header Fix */
-        @media (max-width: 500px) {
-            .login-box { width: 90% !important; padding: 20px; }
-            h1 { font-size: 24px; }
-        }
+        .correct-ans { color: #22c55e; font-weight: bold; margin-top: 5px; }
     </style>
 </head>
 <body class="light">
 
-<div class="login-box" style="width: 500px; margin-bottom: 50px;">
+<div class="login-box" style="width: 90%; max-width: 600px; margin: 40px auto;">
     <h1>Score Card</h1>
     <h3 id="student-info" style="color: #94a3b8;"></h3>
-    <hr style="border: 0; border-top: 1px solid #334155; margin: 20px 0;">
-
+    
     <div class="result-card">
+        <div class="result-line"><span>Total Questions:</span> <span id="total-qs">0</span></div>
         <div class="result-line"><span>Score:</span> <span id="score">0</span></div>
-        <div class="result-line"><span>Attempted:</span> <span id="attempted">0</span></div>
         <div class="result-line"><span>Percentage:</span> <span id="percentage">0%</span></div>
         <div class="result-line"><span>Status:</span> <span id="status">-</span></div>
-        <div class="result-line"><span>Reason:</span> <span id="reason">Normal</span></div>
     </div>
 
     <div id="review-section">
-        <h2>Answer Review</h2>
+        <h2 style="border-bottom: 2px solid #334155; padding-bottom: 10px;">Answer Sheet Review</h2>
         <div id="review-container"></div>
     </div>
 
-    <button onclick="location.href='index.html'" style="margin-top: 30px; width: 100%;">Try Again / Home</button>
+    <button onclick="location.href='index.html'" style="margin-top: 30px; width: 100%;">Back to Home</button>
 </div>
 
 <script>
-    // 1. Data load karein
-    const name = localStorage.getItem("studentName") || "Unknown";
-    const cls = localStorage.getItem("studentClass") || "N/A";
-    const answers = JSON.parse(localStorage.getItem("answers")) || [];
-    const questions = JSON.parse(localStorage.getItem("questions")) || [];
-    const reason = localStorage.getItem("reason") || "Normal Submit";
+    // 1. Data load karein (exam.html mein humne 'reviewData' naam se save kiya tha)
+    const name = localStorage.getItem("studentName") || "Student";
+    const cls = localStorage.getItem("studentClass") || "-";
+    const reviewData = JSON.parse(localStorage.getItem("reviewData")) || []; 
+    const reason = localStorage.getItem("reason") || "Completed";
 
     document.getElementById("student-info").innerText = `${name} | Class: ${cls}`;
 
-    // 2. Score Calculation & Review Logic
+    // 2. Score aur Review Logic
     let score = 0;
-    let attempted = 0;
+    const total = reviewData.length;
     const reviewContainer = document.getElementById("review-container");
 
-    questions.forEach((q, i) => {
-        const userAns = answers[i];
-        const isCorrect = userAns === q.correct;
-        
-        if (userAns) {
-            attempted++;
-            if (isCorrect) score++;
-        }
+    if (total === 0) {
+        reviewContainer.innerHTML = "<p style='color:red;'>No data found. Please complete the exam first.</p>";
+    }
 
-        // Review UI generate karein
+    reviewData.forEach((item, i) => {
+        const isCorrect = item.selected === item.correct;
+        if (isCorrect) score++;
+
+        // Review UI logic
         const card = document.createElement("div");
         card.className = `review-card ${isCorrect ? 'correct' : ''}`;
         
-        // Option text nikalne ke liye logic (e.g., q['a'])
-        const userAnsText = userAns ? q[userAns] : "Not Attempted";
-        const correctAnsText = q[q.correct];
+        const selectedText = item.options[item.selected] || "Not Answered";
+        const correctText = item.options[item.correct];
 
         card.innerHTML = `
-            <div class="question-text">Q${i+1}. ${q.question}</div>
-            <div class="ans-row your-ans">Your Answer: ${userAnsText} ${isCorrect ? '✅' : '❌'}</div>
-            ${!isCorrect ? `<div class="ans-row correct-ans">Correct Answer: ${correctAnsText}</div>` : ''}
+            <div class="question-text">Q${i+1}. ${item.question}</div>
+            <div class="ans-row">Your Answer: <span style="color:${isCorrect ? '#22c55e' : '#ef4444'}">${selectedText} ${isCorrect ? '✅' : '❌'}</span></div>
+            ${!isCorrect ? `<div class="ans-row correct-ans">Correct Answer: ${correctText}</div>` : ''}
         `;
         reviewContainer.appendChild(card);
     });
 
-    const total = questions.length;
+    // 3. Scorecard update
     const percent = total > 0 ? Math.round((score / total) * 100) : 0;
-    const finalStatus = percent >= 50 ? "PASS 🎉" : "FAIL ❌";
-
-    // 3. UI Update
+    document.getElementById("total-qs").innerText = total;
     document.getElementById("score").innerText = `${score} / ${total}`;
-    document.getElementById("attempted").innerText = `${attempted} / ${total}`;
     document.getElementById("percentage").innerText = `${percent}%`;
-    document.getElementById("status").innerText = finalStatus;
+    document.getElementById("status").innerText = percent >= 50 ? "PASS 🎉" : "FAIL ❌";
     document.getElementById("status").className = percent >= 50 ? "status-pass" : "status-fail";
-    document.getElementById("reason").innerText = reason;
 
-    // 4. Google Sheets par Result bhejein
+    // 4. Google Sheets Sync
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec";
-
+    
     fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             name: name,
-            studentClass: cls, // Apps Script ke doPost se match hona chahiye
+            studentClass: cls,
             score: score,
             total: total
         })
-    }).then(() => console.log("Data saved to Google Sheet"));
-
+    });
 </script>
 
 </body>
