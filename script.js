@@ -48,12 +48,17 @@ function sendOTP() {
 
 function verifyOTPAndStart() {
     const otpInput = document.getElementById("otp-input");
-    if (!otpInput) return;
+    
+    // Naya dropdown se value uthane ke liye line:
+    const selectedTime = document.getElementById("exam-time").value;
 
-    if (otpInput.value.trim() == generatedOTP && generatedOTP !== null) {
+    if (otpInput.value.trim() == generatedOTP) {
         localStorage.setItem("studentName", document.getElementById("name").value.trim());
         localStorage.setItem("studentClass", document.getElementById("class").value);
         localStorage.setItem("studentEmail", document.getElementById("email").value.trim());
+        
+        // Ab static "5" ki jagah selectedTime save karein
+        localStorage.setItem("examTime", selectedTime); 
         
         alert("Login Successful!");
         window.location.href = "exam.html";
@@ -61,5 +66,6 @@ function verifyOTPAndStart() {
         alert("Galat OTP!");
     }
 }
+
 
 
