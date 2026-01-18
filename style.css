@@ -127,3 +127,9 @@ button:active { transform: translateY(0); }
     .login-box { padding: 25px 20px; border-radius: 12px; }
     input, select, button { padding: 12px; font-size: 15px; }
 }
+
+@media print {
+    button, .exit-btn, #next-btn, .top-bar button { 
+        display: none !important; 
+    }
+}
