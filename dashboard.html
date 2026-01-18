@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container { max-width: 500px; margin: 50px auto; padding: 20px; text-align: center; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .user-info { margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 5px solid #22c55e; }
+        
+        /* Last Score Box Style */
+        .score-badge { 
+            margin: 15px 0; padding: 10px; background: #eff6ff; border-radius: 8px; 
+            border: 1px dashed #3b82f6; display: none; /* Default hidden */
+        }
+
+        .btn-start { width: 100%; padding: 15px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-bottom: 10px; }
+        .btn-logout { width: 100%; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body class="light">
+    <div class="dashboard-container">
+        <h2>Student Dashboard</h2>
+        
+        <div class="user-info">
+            <h3 id="display-name">Loading...</h3>
+            <p>Class: <span id="display-class">-</span></p>
+            <p>Email: <span id="display-email">-</span></p>
+        </div>
+
+        <div id="last-score-container" class="score-badge">
+            <p style="margin: 0; color: #1e40af; font-weight: bold;">
+                Last Exam Score: <span id="last-score-val">0 / 0</span>
+            </p>
+        </div>
+
+        <div style="margin-bottom: 20px; text-align: left;">
+            <label>Select Exam Duration:</label>
+            <select id="exam-time" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px;">
+                <option value="5">5 Minutes (20 Questions)</option>
+                <option value="10">10 Minutes (40 Questions)</option>
+                <option value="15">15 Minutes (60 Questions)</option>
+                <option value="20">20 Minutes (80 Questions)</option>
+            </select>
+        </div>
+
+        <button class="btn-start" onclick="startExam()">Start New Exam 🚀</button>
+        <button class="btn-logout" onclick="logout()">Logout / Change Account</button>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const name = localStorage.getItem("studentName");
+            const cls = localStorage.getItem("studentClass");
+            const email = localStorage.getItem("studentEmail");
+            const score = localStorage.getItem("lastExamScore"); //
+
+            // Score dikhane ka logic
+            if (score) {
+                document.getElementById("last-score-container").style.display = "block";
+                document.getElementById("last-score-val").innerText = score;
+            }
+
+            if (!name) {
+                window.location.href = "index.html"; 
+            } else {
+                document.getElementById("display-name").innerText = "Welcome, " + name;
+                document.getElementById("display-class").innerText = cls;
+                document.getElementById("display-email").innerText = email;
+            }
+        };
+
+        function startExam() {
+            const time = document.getElementById("exam-time").value;
+            localStorage.setItem("examTime", time); 
+            window.location.href = "exam.html";
+        }
+
+        function logout() {
+            if(confirm("Are you sure you want to logout?")) {
+                localStorage.clear(); //
+                window.location.href = "index.html";
+            }
+        }
+    </script>
+</body>
+</html>
