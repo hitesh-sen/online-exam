@@ -68,7 +68,7 @@
         document.getElementById("status-msg").innerHTML = percent >= 50 ? "<span style='color:#22c55e'>PASS 🎉</span>" : "<span style='color:#ef4444'>FAIL ❌</span>";
 
         // Google Sheet Sync
-        fetch("https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbyQaebDFnZ3htPeOajSJVL-rejWjY-Zyfc57hOL4083h-bFZ5IbiQ0UhaUaE6BIDSI43g/exec", {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify({ name, cls, score, total })
@@ -77,3 +77,4 @@
 </script>
 </body>
 </html>
+
