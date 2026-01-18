@@ -20,16 +20,25 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec";
+        
+        // 1. Dynamic Data Fetching from LocalStorage
+        const savedTime = localStorage.getItem("examTime") || "5"; 
+        const time = parseInt(savedTime);
         const name = localStorage.getItem("studentName") || "Guest";
         const cls = localStorage.getItem("studentClass") || "-";
+        
+        // Time ke hisaab se question limit set karein
+        const limitMapping = { 5: 20, 10: 40, 15: 60, 20: 80 };
+        const limit = limitMapping[time] || 20;
+
         document.getElementById("student").innerText = `${name} | ${cls}`;
 
         let questions = [], userChoices = [], index = 0;
 
-        // API se data mangwana
+        // 2. Fetch Questions based on Dynamic Limit
         fetch(API_URL).then(res => res.json()).then(data => {
-            // Randomly 10 questions uthana
-            questions = data.sort(() => Math.random() - 0.5).slice(0, 10);
+            // Ab questions student ke chune huye time ke limit se slice honge
+            questions = data.sort(() => Math.random() - 0.5).slice(0, limit);
             document.getElementById("next-btn").style.display = "block";
             loadQuestion();
         }).catch(err => {
@@ -37,7 +46,7 @@
         });
 
         function loadQuestion() {
-            if (index >= questions.length) return; // Safety check
+            if (index >= questions.length) return; 
             
             const q = questions[index];
             document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
@@ -51,7 +60,6 @@
                     </label>`;
             });
             
-            // Button text change agar last question hai
             if (index === questions.length - 1) {
                 document.getElementById("next-btn").innerText = "Submit Exam";
             }
@@ -61,7 +69,6 @@
             const sel = document.querySelector("input[name='opt']:checked");
             if (!sel) return alert("Please select an answer!");
 
-            // Current question ka data save karna
             const currentQ = questions[index];
             userChoices.push({
                 question: currentQ.question,
@@ -70,26 +77,24 @@
                 options: { a: currentQ.a, b: currentQ.b, c: currentQ.c, d: currentQ.d }
             });
 
-            index++; // Agle sawaal par jana
+            index++; 
 
-            // Check: Kya agla sawaal hai?
             if (index < questions.length) {
                 loadQuestion();
             } else {
-                finish(); // Agar sawaal khatam, toh finish
+                finish(); 
             }
         }
 
-       function finish() {
-    console.log("Saving data...", userChoices); 
-    localStorage.setItem("reviewData", JSON.stringify(userChoices));
-    setTimeout(() => {
-        window.location.href = "result.html";
-    }, 500); 
-}
+        function finish() {
+            localStorage.setItem("reviewData", JSON.stringify(userChoices));
+            setTimeout(() => {
+                window.location.href = "result.html";
+            }, 500); 
+        }
 
-        // Timer Logic (5 Minutes)
-        let sec = 300; 
+        // 3. Dynamic Timer Logic (Uses 'time' variable)
+        let sec = time * 60; 
         const timerInt = setInterval(() => {
             let m = Math.floor(sec/60), s = sec%60;
             document.getElementById("timer").innerText = `${m}:${s<10?'0'+s:s}`;
@@ -101,4 +106,3 @@
     </script>
 </body>
 </html>
-
