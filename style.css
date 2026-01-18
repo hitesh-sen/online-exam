@@ -129,7 +129,6 @@ button:active { transform: translateY(0); }
 }
 
 @media print {
-    button, .exit-btn, #next-btn, .top-bar button { 
-        display: none !important; 
-    }
+    button, .exit-btn { display: none !important; }
 }
+
