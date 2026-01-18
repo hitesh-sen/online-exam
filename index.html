@@ -8,6 +8,16 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <script type="text/javascript">
+    if (localStorage.getItem("studentEmail")) {
+    window.location.href = "dashboard.html";
+}
+    window.onload = function() {
+    const savedEmail = localStorage.getItem("studentEmail");
+    if (savedEmail) {
+        alert("Welcome back, " + localStorage.getItem("studentName") + "!");
+        window.location.href = "dashboard.html"; 
+    }
+};
    (function(){
       emailjs.init("dNirsJkwieq53_oF4"); 
    })();
@@ -53,6 +63,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
