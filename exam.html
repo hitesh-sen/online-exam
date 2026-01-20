@@ -1,109 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Exam</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Exam</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body class="light">
-    <div class="top-bar">
-        <div><b id="student"></b> <button onclick="location.href='index.html'" style="width:auto; padding:5px; background:red; color:white; border:none; border-radius:5px; cursor:pointer;">Exit</button></div>
-        <span id="timer">00:00</span>
-    </div>
 
-    <div class="login-box" style="max-width: 600px; margin: 20px auto;">
-        <h2 id="question">Loading Questions...</h2>
-        <div id="options-container"></div>
-        <button id="next-btn" onclick="nextQuestion()" style="display:none; width: 100%; padding: 12px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Next Question</button>
-    </div>
+<div class="top-bar">
+  <div>
+    <b id="student"></b>
+    <button onclick="location.href='index.html'"
+      style="width:auto;padding:5px;background:red;color:white;border:none;border-radius:5px;cursor:pointer;">
+      Exit
+    </button>
+  </div>
+  <span id="timer">00:00</span>
+</div>
 
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec";
-        
-        // 1. Dynamic Data Fetching from LocalStorage
-        const savedTime = localStorage.getItem("examTime") || "5"; 
-        const time = parseInt(savedTime);
-        const name = localStorage.getItem("studentName") || "Guest";
-        const cls = localStorage.getItem("studentClass") || "-";
-        
-        // Time ke hisaab se question limit set karein
-        const limitMapping = { 5: 20, 10: 40, 15: 60, 20: 80 };
-        const limit = limitMapping[time] || 20;
+<div class="login-box" style="max-width:600px;margin:20px auto;">
+  <h2 id="question">Loading Questions...</h2>
+  <div id="options-container"></div>
 
-        document.getElementById("student").innerText = `${name} | ${cls}`;
+  <button id="prev-btn" onclick="prevQuestion()" disabled
+    style="width:100%;padding:12px;background:#64748b;color:white;
+    border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:10px;">
+    Previous Question
+  </button>
 
-        let questions = [], userChoices = [], index = 0;
+  <button id="next-btn" onclick="nextQuestion()"
+    style="display:none;width:100%;padding:12px;background:#22c55e;color:white;
+    border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+    Next Question
+  </button>
+</div>
 
-        // 2. Fetch Questions based on Dynamic Limit
-        fetch(API_URL).then(res => res.json()).then(data => {
-            // Ab questions student ke chune huye time ke limit se slice honge
-            questions = data.sort(() => Math.random() - 0.5).slice(0, limit);
-            document.getElementById("next-btn").style.display = "block";
-            loadQuestion();
-        }).catch(err => {
-            document.getElementById("question").innerText = "Error loading questions. Please check connection.";
-        });
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec";
 
-        function loadQuestion() {
-            if (index >= questions.length) return; 
-            
-            const q = questions[index];
-            document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
-            const container = document.getElementById('options-container');
-            container.innerHTML = ""; 
-            
-            ["a", "b", "c", "d"].forEach(opt => {
-                container.innerHTML += `
-                    <label class="option-card" style="display:block; margin:10px 0; padding:12px; border:1px solid #ccc; border-radius:8px; cursor:pointer; text-align:left;">
-                        <input type="radio" name="opt" value="${opt}" style="margin-right:10px;"> ${q[opt]}
-                    </label>`;
-            });
-            
-            if (index === questions.length - 1) {
-                document.getElementById("next-btn").innerText = "Submit Exam";
-            }
-        }
+// ---------------- USER DATA ----------------
+const savedTime = localStorage.getItem("examTime") || "5";
+const time = parseInt(savedTime);
+const name = localStorage.getItem("studentName") || "Guest";
+const cls = localStorage.getItem("studentClass") || "-";
 
-        function nextQuestion() {
-            const sel = document.querySelector("input[name='opt']:checked");
-            if (!sel) return alert("Please select an answer!");
+document.getElementById("student").innerText = `${name} | ${cls}`;
 
-            const currentQ = questions[index];
-            userChoices.push({
-                question: currentQ.question,
-                selected: sel.value,
-                correct: currentQ.correct,
-                options: { a: currentQ.a, b: currentQ.b, c: currentQ.c, d: currentQ.d }
-            });
+// ---------------- QUESTION CONFIG ----------------
+const limitMapping = { 5: 20, 10: 40, 15: 60, 20: 80 };
+const limit = limitMapping[time] || 20;
 
-            index++; 
+let questions = [];
+let userChoices = [];
+let index = 0;
 
-            if (index < questions.length) {
-                loadQuestion();
-            } else {
-                finish(); 
-            }
-        }
+// ---------------- FETCH QUESTIONS ----------------
+fetch(API_URL)
+.then(res => res.json())
+.then(data => {
+  questions = data.sort(() => Math.random() - 0.5).slice(0, limit);
+  document.getElementById("next-btn").style.display = "block";
+  loadQuestion();
+})
+.catch(() => {
+  document.getElementById("question").innerText = "Error loading questions!";
+});
 
-        function finish() {
-            localStorage.setItem("reviewData", JSON.stringify(userChoices));
-            setTimeout(() => {
-                window.location.href = "result.html";
-            }, 500); 
-        }
+// ---------------- LOAD QUESTION ----------------
+function loadQuestion() {
+  const q = questions[index];
+  document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
+  const container = document.getElementById("options-container");
+  container.innerHTML = "";
 
-        // 3. Dynamic Timer Logic (Uses 'time' variable)
-        let sec = time * 60; 
-        const timerInt = setInterval(() => {
-            let m = Math.floor(sec/60), s = sec%60;
-            document.getElementById("timer").innerText = `${m}:${s<10?'0'+s:s}`;
-            if (sec-- <= 0) {
-                clearInterval(timerInt);
-                finish();
-            }
-        }, 1000);
-    </script>
+  ["a","b","c","d"].forEach(opt => {
+    container.innerHTML += `
+      <label class="option-card"
+      style="display:block;margin:10px 0;padding:12px;border:1px solid #ccc;
+      border-radius:8px;cursor:pointer;text-align:left;">
+        <input type="radio" name="opt" value="${opt}" style="margin-right:10px;">
+        ${q[opt]}
+      </label>`;
+  });
+
+  // Restore selected answer
+  if (userChoices[index]) {
+    const saved = userChoices[index].selected;
+    const radio = document.querySelector(`input[value="${saved}"]`);
+    if (radio) radio.checked = true;
+  }
+
+  document.getElementById("prev-btn").disabled = index === 0;
+  document.getElementById("next-btn").innerText =
+    index === questions.length - 1 ? "Submit Exam" : "Next Question";
+}
+
+// ---------------- NEXT ----------------
+function nextQuestion() {
+  const sel = document.querySelector("input[name='opt']:checked");
+  if (!sel) return alert("Please select an answer!");
+
+  const q = questions[index];
+  userChoices[index] = {
+    question: q.question,
+    selected: sel.value,
+    correct: q.correct,
+    options: { a: q.a, b: q.b, c: q.c, d: q.d }
+  };
+
+  if (index < questions.length - 1) {
+    index++;
+    loadQuestion();
+  } else {
+    finish();
+  }
+}
+
+// ---------------- PREVIOUS ----------------
+function prevQuestion() {
+  if (index > 0) {
+    index--;
+    loadQuestion();
+  }
+}
+
+// ---------------- FINISH ----------------
+function finish() {
+  localStorage.setItem("reviewData", JSON.stringify(userChoices));
+  window.location.href = "result.html";
+}
+
+// ---------------- TIMER ----------------
+let sec = time * 60;
+const timerInt = setInterval(() => {
+  let m = Math.floor(sec / 60);
+  let s = sec % 60;
+  document.getElementById("timer").innerText =
+    `${m}:${s < 10 ? "0"+s : s}`;
+
+  if (sec-- <= 0) {
+    clearInterval(timerInt);
+    finish();
+  }
+}, 1000);
+</script>
+
 </body>
 </html>
-
