@@ -7,19 +7,26 @@
 <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="dark">
-<div class="result-box">
+<body class="light">
 
-    <h1>Your Scorecard</h1>
-    <p id="student-meta"></p>
-    <div class="score" id="display-score">0 / 0</div>
-    <div id="status-msg" style="margin-bottom:20px;font-weight:bold;"></div>
-
-    <h2>Answer Review</h2>
-    <div id="review-container"></div>
-
-    <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+<div class="top-bar">
+    <h2>Exam Result</h2>
 </div>
+
+<div class="result-container">
+    <div class="result-card">
+        <h1>Your Scorecard</h1>
+        <p id="student-meta"></p>
+
+        <div class="score-display" id="display-score">0 / 0</div>
+        <div id="status-msg" class="result-status"></div>
+
+        <button onclick="goDashboard()">Back to Dashboard</button>
+    </div>
+
+    <div id="answer-review" class="answer-review"></div>
+</div>
+
 
 <script>
 window.onload = function () {
@@ -77,4 +84,5 @@ window.onload = function () {
 
 </body>
 </html>
+
 
