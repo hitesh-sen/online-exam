@@ -97,12 +97,23 @@
             // Tip: Use URLSearchParams for reliable 'no-cors' delivery
             const scriptURL = "https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec";
             
-            fetch(`${scriptURL}?name=${encodeURIComponent(name)}&cls=${encodeURIComponent(cls)}&score=${score}&total=${total}`, {
-                method: "POST",
-                mode: "no-cors"
-            });
+           fetch(scriptURL, {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        name: name,
+        cls: cls,
+        score: score,
+        total: total
+    }),
+    mode: "no-cors"
+});
+
         };
     </script>
 </body>
 </html>
+
 
