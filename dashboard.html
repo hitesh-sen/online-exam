@@ -13,11 +13,13 @@
 
 <body class="light">
 
+<div class="top-bar">
+    <h2>Bothverse Dashboard</h2>
+</div>
+
 <div class="dashboard-container">
     <h1>Student Dashboard</h1>
-    <p style="font-size: 0.95rem; color:#475569;">
-        IT students can take online quizzes and track their latest exam score.
-    </p>
+    <p class="subtitle">IT students can take online quizzes and track their latest exam score.</p>
 
     <div class="user-info">
         <h3 id="display-name">Loading...</h3>
@@ -26,23 +28,19 @@
     </div>
 
     <div id="last-score-container" class="score-badge">
-        <p style="margin: 0; color: #1e40af; font-weight: bold;">
-            Last Exam Score: <span id="last-score-val">0 / 0</span>
-        </p>
+        Last Exam Score: <span id="last-score-val">0 / 0</span>
     </div>
 
-    <div style="margin-bottom: 20px; text-align: left;">
-        <label><strong>Select Exam Duration</strong></label>
-        <select id="exam-time" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px;">
-            <option value="5">5 Minutes (20 Questions)</option>
-            <option value="10">10 Minutes (40 Questions)</option>
-            <option value="15">15 Minutes (60 Questions)</option>
-            <option value="20">20 Minutes (80 Questions)</option>
-        </select>
-    </div>
+    <label class="label">Select Exam Duration</label>
+    <select id="exam-time">
+        <option value="5">5 Minutes (20 Questions)</option>
+        <option value="10">10 Minutes (40 Questions)</option>
+        <option value="15">15 Minutes (60 Questions)</option>
+        <option value="20">20 Minutes (80 Questions)</option>
+    </select>
 
-    <button class="btn-start" onclick="startExam()">Start New Exam 🚀</button>
-    <button class="btn-logout" onclick="logout()">Logout / Change Account</button>
+    <button onclick="startExam()">Start New Exam 🚀</button>
+    <button onclick="logout()" class="danger">Logout / Change Account</button>
 </div>
 
 <script>
