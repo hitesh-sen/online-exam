@@ -4,43 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Online Exam Portal | Bothverse Academy</title>
-<meta name="description" content="Official Online Exam Portal for BCA, BTech and CS Students. Practice quizzes and improve your skills.">
-<meta name="keywords" content="BCA Quiz, BTech Exam, Bothverse Academy, Online Test">
 <link rel="stylesheet" href="style.css">
 <style>
-  /* Choti si safety UI update */
-  .option-card:hover { background: #f1f5f9; border-color: #6366f1 !important; }
-  #tab-warning-ui { color: #f59e0b; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display: block; }
+  /* 1. HOVER FIX: Text nazar aana chahiye */
+  .option-card { 
+      display:block; margin:10px 0; padding:12px; border:1px solid #ccc; 
+      border-radius:8px; cursor:pointer; text-align:left; transition: 0.2s;
+      background: #1e293b; color: white; /* Dark theme jaisa screenshot mein hai */
+  }
+  .option-card:hover { 
+      background: #334155 !important; /* Thoda light grey, white nahi! */
+      border-color: #22c55e !important;
+  }
+  #tab-warning-ui { color: #f59e0b; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display: block; text-align: center; }
+  
+  /* Loading state ke liye buttons hide rakhna */
+  .hidden { display: none !important; }
 </style>
 </head>
 
 <body class="light">
 
-<div class="top-bar">
+<div class="top-bar" style="background: #22c55e; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;">
   <div>
     <b id="student"></b>
-    <button onclick="location.href='index.html'"
-      style="width:auto;padding:5px 12px;background:red;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">
-      Exit
-    </button>
+    <button onclick="location.href='index.html'" style="padding:5px 12px; background:red; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin-left:10px;">Exit</button>
   </div>
-  <span id="timer">00:00</span>
+  <span id="timer" style="font-weight:bold;">00:00</span>
 </div>
 
-<div class="login-box" style="max-width:600px;margin:20px auto; padding: 20px;">
+<div class="login-box" style="max-width:600px; margin:40px auto; padding: 25px; background: #0f172a; border-radius: 15px;">
   <span id="tab-warning-ui"></span>
-  <h2 id="question">Loading Questions...</h2>
+  <h2 id="question" style="color: white; text-align: center; font-size: 1.4rem;">Loading Questions...</h2>
   <div id="options-container"></div>
 
-  <button id="prev-btn" onclick="prevQuestion()"
-    style="width:100%;padding:12px;background:#64748b;color:white;
-    border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-bottom:10px;">
+  <button id="prev-btn" onclick="prevQuestion()" class="hidden"
+    style="width:100%; padding:12px; background:#475569; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
     Previous Question
   </button>
 
-  <button id="next-btn" onclick="nextQuestion()"
-    style="display:none;width:100%;padding:12px;background:#22c55e;color:white;
-    border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+  <button id="next-btn" onclick="nextQuestion()" class="hidden"
+    style="width:100%; padding:12px; background:#22c55e; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
     Next Question
   </button>
 </div>
@@ -48,27 +52,24 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwTMB_a1P1s9ukPenPvPxVFF2ZFtyyNN0M0sPe_7FovXpNkzd7yv18LsfZeQ0Y7yN6z4A/exec";
 
-// --- ANTI-CHEAT (Production Security) ---
-document.addEventListener('contextmenu', e => e.preventDefault()); // Right-click Block
-document.onkeydown = e => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false; }; // F12 & Inspect Block
-
+// --- SECURITY LOGIC (Fixed for Submit) ---
 let warnings = 0;
+let isSubmitting = false; // Flag to stop alerts during submission
+
 window.onblur = () => {
+    if(isSubmitting) return; // Agar submit ho raha hai toh alert mat dikhao
     warnings++;
     document.getElementById("tab-warning-ui").innerText = `⚠️ Tab Switches: ${warnings}/3`;
-    if(warnings >= 3) { alert("Auto-submitting due to tab switch!"); finish(); }
-    else { alert("Warning: Do not leave this page!"); }
+    if(warnings >= 3) { finish(); }
+    else { alert("Warning: Do not switch tabs!"); }
 };
 
-// ---------------- USER DATA (Your Original) ----------------
 const savedTime = localStorage.getItem("examTime") || "5";
 const time = parseInt(savedTime);
 const name = localStorage.getItem("studentName") || "Guest";
 const cls = localStorage.getItem("studentClass") || "-";
-
 document.getElementById("student").innerText = `${name} | ${cls}`;
 
-// ---------------- QUESTION CONFIG ----------------
 const limitMapping = { 5: 20, 10: 40, 15: 60, 20: 80 };
 const limit = limitMapping[time] || 20;
 
@@ -76,19 +77,16 @@ let questions = [];
 let userChoices = [];
 let index = 0;
 
-// ---------------- FETCH QUESTIONS (Your Original) ----------------
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
   questions = data.sort(() => Math.random() - 0.5).slice(0, limit);
-  document.getElementById("next-btn").style.display = "block";
+  // Questions load hone ke baad hi buttons dikhao
+  document.getElementById("next-btn").classList.remove("hidden");
   loadQuestion();
-})
-.catch(() => {
-  document.getElementById("question").innerText = "Error loading questions!";
+  startTimer();
 });
 
-// ---------------- LOAD QUESTION (Your Original) ----------------
 function loadQuestion() {
   const q = questions[index];
   document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
@@ -97,75 +95,70 @@ function loadQuestion() {
 
   ["a","b","c","d"].forEach(opt => {
     container.innerHTML += `
-      <label class="option-card"
-      style="display:block;margin:10px 0;padding:12px;border:1px solid #ccc;
-      border-radius:8px;cursor:pointer;text-align:left;">
+      <label class="option-card">
         <input type="radio" name="opt" value="${opt}" style="margin-right:10px;">
         ${q[opt]}
       </label>`;
   });
 
   if (userChoices[index]) {
-    const saved = userChoices[index].selected;
-    const radio = document.querySelector(`input[value="${saved}"]`);
+    const radio = document.querySelector(`input[value="${userChoices[index].selected}"]`);
     if (radio) radio.checked = true;
   }
 
+  // 2. PREVIOUS BUTTON FIX: Index 0 par hide rakho
   const prevBtn = document.getElementById("prev-btn");
-  prevBtn.style.display = (index === 0) ? "none" : "block";
+  if (index === 0) prevBtn.classList.add("hidden");
+  else prevBtn.classList.remove("hidden");
 
   document.getElementById("next-btn").innerText =
     index === questions.length - 1 ? "Submit Exam" : "Next Question";
 }
 
-// ---------------- NEXT (Your Original) ----------------
 function nextQuestion() {
   const sel = document.querySelector("input[name='opt']:checked");
   if (!sel) return alert("Please select an answer!");
 
-  const q = questions[index];
   userChoices[index] = {
-    question: q.question,
+    question: questions[index].question,
     selected: sel.value,
-    correct: q.correct,
-    options: { a: q.a, b: q.b, c: q.c, d: q.d }
+    correct: questions[index].correct,
+    options: { a: questions[index].a, b: questions[index].b, c: questions[index].c, d: questions[index].d }
   };
 
   if (index < questions.length - 1) {
     index++;
     loadQuestion();
   } else {
-    if(confirm("Submit Exam?")) finish();
+    // 3. SUBMIT FIX: Confirmation se pehle flag on karo
+    isSubmitting = true; 
+    if(confirm("Are you sure you want to submit the exam?")) {
+        finish();
+    } else {
+        isSubmitting = false; // Agar cancel kiya toh wapas security on
+    }
   }
 }
 
-// ---------------- PREVIOUS (Your Original) ----------------
 function prevQuestion() {
-  if (index > 0) {
-    index--;
-    loadQuestion();
-  }
+  if (index > 0) { index--; loadQuestion(); }
 }
 
-// ---------------- FINISH (Your Original) ----------------
 function finish() {
+  isSubmitting = true; 
   localStorage.setItem("reviewData", JSON.stringify(userChoices));
   window.location.href = "result.html";
 }
 
-// ---------------- TIMER (Your Original) ----------------
-let sec = time * 60;
-const timerInt = setInterval(() => {
-  let m = Math.floor(sec / 60);
-  let s = sec % 60;
-  document.getElementById("timer").innerText = `${m}:${s < 10 ? "0"+s : s}`;
-
-  if (sec-- <= 0) {
-    clearInterval(timerInt);
-    finish();
-  }
-}, 1000);
+function startTimer() {
+  let sec = time * 60;
+  const timerInt = setInterval(() => {
+    let m = Math.floor(sec / 60);
+    let s = sec % 60;
+    document.getElementById("timer").innerText = `${m}:${s < 10 ? "0"+s : s}`;
+    if (sec-- <= 0) { clearInterval(timerInt); finish(); }
+  }, 1000);
+}
 </script>
-
 </body>
 </html>
