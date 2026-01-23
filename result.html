@@ -1,73 +1,88 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Result | Bothverse Academy</title>
+    <title>Final Result</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .result-box { max-width: 600px; margin: 40px auto; background: #1e293b; color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
-        .score { font-size: 3.5rem; color: #22c55e; font-weight: bold; margin: 10px 0; text-shadow: 0 0 10px rgba(34, 197, 94, 0.3); }
-        .review-card { background: #0f172a; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; border-left: 5px solid #64748b; }
-        .btn-home { background: #22c55e; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; font-size: 1rem; }
-        .print-btn { background: #3b82f6; color: white; padding: 15px; margin-top: 20px; border-radius: 8px; width: 100%; cursor: pointer; border: none; font-weight: bold; }
-        
-        @media print {
-            button, .print-btn, .btn-home, #review-list { display: none !important; }
-            body { background: white !important; padding: 0; }
-            .result-box { box-shadow: none !important; color: black !important; background: white !important; margin: 0; width: 100%; border: 2px solid #eee; }
-            .score { color: #16a34a !important; }
-            #student-meta { color: #334155 !important; font-weight: bold; }
-        }
+        .result-box { max-width: 600px; margin: 40px auto; background: #1e293b; color: white; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .score { font-size: 3rem; color: #22c55e; font-weight: bold; margin: 20px 0; }
+        .review-card { background: #0f172a; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; border-left: 5px solid #ef4444; }
+        .review-card.correct { border-left-color: #22c55e; }
+        .btn-home { background: #22c55e; color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 20px; }
     </style>
 </head>
 <body class="light">
-    <div class="result-box">
-        <h1 style="margin-bottom: 5px;">Performance Report</h1>
-        <p id="student-meta" style="color: #94a3b8; font-size: 1.1rem;"></p>
-        
-        <div class="score" id="display-score">-- / --</div>
-        <div id="status-msg" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;"></div>
 
-        <div id="review-list">
-            <h3 style="text-align: left; border-bottom: 1px solid #334155; padding-bottom: 10px; color: #cbd5e1;">Review Your Choices</h3>
-            <div id="cards-container"></div>
-        </div>
+<div class="result-box">
+    <h1>Your Scorecard</h1>
+    <p id="student-meta" style="color: #94a3b8;"></p>
+    <div class="score" id="display-score">0 / 0</div>
+    <div id="status-msg" style="font-size: 1.2rem; margin-bottom: 20px;"></div>
 
-        <button class="print-btn" onclick="window.print()">Download Marksheet 📄</button>
-        <button class="btn-home" onclick="location.href='dashboard.html'">Back to Dashboard</button>
+    <div id="review-list">
+        <h3 style="text-align: left; border-bottom: 1px solid #334155; padding-bottom: 10px;">Review Answers</h3>
+        <div id="cards-container"></div>
     </div>
+    <button onclick="window.print()" style="background: #3b82f6; color: white; padding: 10px; margin-top: 10px; border-radius: 8px; width: 100%; cursor: pointer; border: none; font-weight: bold;">
+        Download / Print Scorecard 📄
+    </button>
+    @media print {
+    button, .exit-btn { display: none !important; }
+}
+    <button class="btn-home" onclick="location.href='index.html'">Finish & Exit</button>
+</div>
 
-    <script>
-      window.onload = function () {
-    const name = localStorage.getItem("studentName") || "Student";
-    const cls = localStorage.getItem("studentClass") || "BCA";
-    const rawData = localStorage.getItem("reviewData");
-    
-    if (!rawData) return;
-    const reviewData = JSON.parse(rawData);
+<script>
+    window.onload = function() {
+        const name = localStorage.getItem("studentName") || "Student";
+        const cls = localStorage.getItem("studentClass") || "-";
+        const rawData = localStorage.getItem("reviewData");
 
-    let score = 0;
-    reviewData.forEach(item => {
-        if (item.selected === item.correct) score++;
-    });
+        if (!rawData) {
+            document.querySelector(".result-box").innerHTML = "<h2>No Data Found. Please complete the exam first!</h2><button class='btn-home' onclick='location.href=\"index.html\"'>Go to Login</button>";
+            return;
+        }
 
-    document.getElementById("display-score").innerText = `${score} / ${reviewData.length}`;
+        const reviewData = JSON.parse(rawData);
+        document.getElementById("student-meta").innerText = `${name} | Class: ${cls}`;
 
-    // --- SAVE TO GOOGLE SHEET (Sheet1 Logic) ---
-    fetch(API_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify({
-            name: name,
-            cls: cls,
-            score: score,
-            total: reviewData.length
-        })
-    }).then(() => console.log("Result Synced"));
-};
-    </script>
+        let score = 0;
+        const total = reviewData.length;
+        const container = document.getElementById("cards-container");
+
+        reviewData.forEach((item, i) => {
+            const isCorrect = item.selected === item.correct;
+            if (isCorrect) score++;
+
+            const card = document.createElement("div");
+            card.className = `review-card ${isCorrect ? 'correct' : ''}`;
+            card.innerHTML = `
+                <div style="font-weight:bold;">Q${i+1}. ${item.question}</div>
+                <div style="color: ${isCorrect ? '#22c55e' : '#ef4444'}">
+                    Ans: ${item.options[item.selected] || "Skipped"} ${isCorrect ? '✅' : '❌'}
+                </div>
+                ${!isCorrect ? `<div style="color: #94a3b8; font-size: 0.9rem;">Correct: ${item.options[item.correct]}</div>` : ''}
+            `;
+            container.appendChild(card);
+        });
+
+        document.getElementById("display-score").innerText = `${score} / ${total}`;
+        const percent = Math.round((score / total) * 100);
+        document.getElementById("status-msg").innerHTML = percent >= 50 ? "<span style='color:#22c55e'>PASS 🎉</span>" : "<span style='color:#ef4444'>FAIL ❌</span>";
+
+        // Google Sheet Sync
+        fetch("https://script.google.com/macros/s/AKfycbyQaebDFnZ3htPeOajSJVL-rejWjY-Zyfc57hOL4083h-bFZ5IbiQ0UhaUaE6BIDSI43g/exec", {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify({ name, cls, score, total })
+        });
+    };
+</script>
 </body>
 </html>
+
 
 
