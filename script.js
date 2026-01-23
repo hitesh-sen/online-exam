@@ -1,84 +1,46 @@
-let mode = "light";
 let generatedOTP = null;
-let otpAttempts = 0;   // security: limit attempts
 
-// 🌙 Dark / Light Mode
-document.getElementById("toggleMode").onclick = () => {
-    mode = (mode === "light") ? "dark" : "light";
-    document.body.className = mode;
-    document.getElementById("toggleMode").innerText = (mode === "light") ? "🌙" : "☀️";
-};
+(function(){
+    emailjs.init("dNirsJkwieq53_oF4");
+})();
 
-// Autofill saved data
-window.onload = () => {
-    const savedName = localStorage.getItem("studentName");
-    const savedClass = localStorage.getItem("studentClass");
-    const savedEmail = localStorage.getItem("studentEmail");
-
-    if (savedName) document.getElementById("name").value = savedName;
-    if (savedClass) document.getElementById("class").value = savedClass;
-    if (savedEmail) document.getElementById("email").value = savedEmail;
-};
-
-// 📩 Send OTP
 function sendOTP() {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const cls = document.getElementById("class").value;
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const cls = classSelect.value;
 
     if (!name || !email || !cls) {
-        alert("Please fill Name, Email and Class first!");
+        alert("Fill all details first!");
         return;
     }
 
     generatedOTP = Math.floor(100000 + Math.random() * 900000);
-    otpAttempts = 0; // reset attempts
 
-    const templateParams = {
+    emailjs.send('service_p4n3jt9','template_kxgdizu',{
         to_name: name,
         email: email,
         otp: generatedOTP
-    };
-
-    emailjs.send('service_p4n3jt9', 'template_kxgdizu', templateParams)
-        .then(() => {
-            alert("OTP sent to your email!");
-            document.getElementById("otp-section").style.display = "block";
-            document.getElementById("send-otp-btn").style.display = "none";
-        })
-        .catch(() => {
-            alert("Email service blocked. Check EmailJS settings.");
-        });
+    }).then(() => {
+        alert("OTP sent to email");
+        otpSection.style.display = "block";
+        sendOtpBtn.style.display = "none";
+    }).catch(() => alert("Email sending failed"));
 }
 
-// ✅ Verify OTP
 function verifyOTPAndStart() {
-    const otpInput = document.getElementById("otp-input").value.trim();
-    const selectedTime = document.getElementById("exam-time").value;
-
-    if (!generatedOTP) {
-        alert("Please request OTP first!");
-        return;
-    }
-
-    otpAttempts++;
-
-    if (otpAttempts > 5) {
-        alert("Too many wrong attempts. Please refresh and try again.");
-        return;
-    }
-
-    if (otpInput == generatedOTP) {
-
-        localStorage.setItem("studentName", document.getElementById("name").value.trim());
-        localStorage.setItem("studentClass", document.getElementById("class").value);
-        localStorage.setItem("studentEmail", document.getElementById("email").value.trim());
-        localStorage.setItem("examTime", selectedTime);
-
-        alert("Login Successful!");
-        window.location.href = "exam.html";
-
-    } else {
-        alert("Wrong OTP! Attempts left: " + (5 - otpAttempts));
-    }
+    if (otpInput.value == generatedOTP) {
+        localStorage.setItem("studentName", nameInput.value.trim());
+        localStorage.setItem("studentClass", classSelect.value);
+        localStorage.setItem("studentEmail", emailInput.value.trim());
+        localStorage.setItem("examTime", examTimeSelect.value);
+        window.location.href = "dashboard.html";
+    } else alert("Wrong OTP");
 }
+
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const classSelect = document.getElementById("class");
+const examTimeSelect = document.getElementById("exam-time");
+const otpSection = document.getElementById("otp-section");
+const otpInput = document.getElementById("otp-input");
+const sendOtpBtn = document.getElementById("send-otp-btn");
