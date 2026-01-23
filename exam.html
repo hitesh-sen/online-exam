@@ -25,29 +25,19 @@
 
 <body class="light">
 
-<div class="top-bar" style="background: #22c55e; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;">
-  <div>
-    <b id="student"></b>
-    <button onclick="location.href='index.html'" style="padding:5px 12px; background:red; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; margin-left:10px;">Exit</button>
-  </div>
-  <span id="timer" style="font-weight:bold;">00:00</span>
+<div class="top-bar">
+    <h2 id="student-info">Student | Exam</h2>
+    <div id="timer">10:00</div>
 </div>
 
-<div class="login-box">
-  <span id="tab-warning-ui"></span>
-  <h2 id="question" style="color: white; text-align: center; font-size: 1.4rem;">Loading Questions...</h2>
-  <div id="options-container"></div>
-
-  <button id="prev-btn" onclick="prevQuestion()" class="hidden"
-    style="width:100%; padding:12px; background:#475569; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-bottom:10px;">
-    Previous Question
-  </button>
-
-  <button id="next-btn" onclick="nextQuestion()" class="hidden"
-    style="width:100%; padding:12px; background:#22c55e; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
-    Next Question
-  </button>
+<div class="exam-container">
+    <div class="question-card">
+        <h2 id="question-text">Loading question...</h2>
+        <div id="options-container"></div>
+        <button onclick="nextQuestion()">Next Question</button>
+    </div>
 </div>
+
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec";
@@ -162,6 +152,7 @@ function startTimer() {
 </script>
 </body>
 </html>
+
 
 
 
