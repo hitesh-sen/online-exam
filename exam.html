@@ -148,8 +148,29 @@ function prevQuestion() {
     }
 }
 
-function finish() {
-    localStorage.setItem("reviewData", JSON.stringify(userChoices));
+async function finish() {
+    const studentName = localStorage.getItem("studentName");
+    const studentClass = localStorage.getItem("studentClass");
+
+    // Loading message dikhayein
+    document.getElementById("question").innerText = "Submitting and calculating score...";
+
+    const response = await fetch(`${API_URL}?action=submitExam`, {
+        method: "POST",
+        body: JSON.stringify({
+            name: studentName,
+            className: studentClass,
+            answers: userChoices
+        })
+    });
+
+    const result = await response.json();
+    
+    // Score save karein result page ke liye
+    localStorage.setItem("finalScore", result.score);
+    localStorage.setItem("finalTotal", result.total);
+    localStorage.setItem("reviewData", JSON.stringify(userChoices)); // Sirf review ke liye
+    
     window.location.href = "result.html";
 }
 
@@ -175,5 +196,6 @@ function startTimer() {
 </script>
 </body>
 </html>
+
 
 
