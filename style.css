@@ -9,17 +9,14 @@ body {
     min-height: 100vh;
     background: #f1f5f9;
     padding: 80px 15px 40px 15px;
-    box-sizing: border-box;
     transition: background 0.3s, color 0.3s;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Light & Dark Modes */
 .light { background: #f1f5f9; color: #1e293b; }
 .dark { background: #0f172a; color: #f8fafc; }
 
-/* Center only login page */
+/* ONLY login page center */
 .center-page {
     display: flex;
     justify-content: center;
@@ -40,19 +37,20 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.top-bar h2 { margin: 0; font-size: 1.2rem; }
-
-/* Login Box Styling */
-.login-box {
+/* Cards (USED EVERYWHERE) */
+.card {
     background: #1e293b;
     padding: 30px;
     border-radius: 16px;
-    width: 100%;
-    max-width: 420px;
-    text-align: center;
-    color: white;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    color: white;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
 }
+
+/* Login Box */
+.login-box { max-width: 420px; }
 
 /* Inputs */
 input, select {
@@ -69,19 +67,6 @@ input, select {
 input:focus, select:focus {
     outline: 3px solid #22c55e;
     outline-offset: 2px;
-}
-
-/* OTP Section */
-#otp-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #334155;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Buttons */
@@ -101,4 +86,37 @@ button {
 }
 
 button:hover { background: #1a9e4b; transform: translateY(-2px); }
-button:active { transfo
+
+/* Question Options */
+.option-card {
+    display:block;
+    margin:10px 0;
+    padding:12px;
+    border:1px solid #334155;
+    border-radius:8px;
+    cursor:pointer;
+    background:#0f172a;
+    color:white;
+}
+.option-card:hover { border-color:#22c55e; }
+
+/* RESULT PAGE */
+.result-score {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.pass { color:#22c55e; }
+.fail { color:#ef4444; }
+
+/* Dashboard */
+.dashboard-box {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width:480px) {
+    body { padding-top:70px; }
+}
