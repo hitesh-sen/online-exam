@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Block private/student pages
+Disallow: /dashboard.html
+Disallow: /exam.html
+Disallow: /result.html
+
+Sitemap: https://hitesh-sen.github.io/online-exam/sitemap.xml
