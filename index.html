@@ -1,94 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Responsive -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bothverse Exam Portal | BCA & BTech Online Test</title>
+<meta name="description" content="Practice online IT quizzes for BCA, B.Tech and MCA students. Timed mock tests with instant results.">
+<meta name="keywords" content="BCA quiz, BTech mock test, MCA online exam, IT practice test">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://hitesh-sen.github.io/online-exam/">
 
-    <!-- SEO -->
-    <title>Bothverse Exam Portal | Online Tests for BCA, BTech & MCA</title>
-    <meta name="description" content="Bothverse online exam portal for BCA, BTech, MCA and Computer Science students. Practice IT quizzes with instant results." />
-    <meta name="keywords" content="BCA online test, BTech quiz, MCA exam practice, IT mock test, Bothverse exam portal" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://hitesh-sen.github.io/online-exam/" />
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="Bothverse Exam Portal" />
-    <meta property="og:description" content="Practice online IT exams for BCA, BTech & MCA students with instant results." />
-    <meta property="og:url" content="https://hitesh-sen.github.io/online-exam/" />
-    <meta property="og:type" content="website" />
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
-
-    <!-- EmailJS -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 
-<body class="light">
+<body class="light center-page">
 
-    <!-- Top Bar -->
-    <header class="top-bar">
-        <h2 style="margin:0; font-size:1.2rem;">Bothverse Online Exam</h2>
-        <button id="toggleMode" style="width:auto; padding:5px 10px;">🌙</button>
-    </header>
+<div class="login-box">
+    <h1>Student Login</h1>
 
-    <!-- MAIN LOGIN SECTION -->
-    <main class="login-box">
+    <input id="name" type="text" placeholder="Full Name">
+    <input id="email" type="email" placeholder="Email Address">
 
-        <h1>Student Login</h1>
+    <select id="class">
+        <option value="">Select Your Class</option>
+        <option value="BCA">BCA</option>
+        <option value="BTech">B.Tech</option>
+        <option value="MCA">MCA</option>
+        <option value="Other">Other</option>
+    </select>
 
-        <!-- SEO-safe text -->
-        <p style="font-size:0.95rem; color:#475569;">
-            Login to start online IT quizzes designed for BCA, BTech, MCA and Computer Science students.
-        </p>
+    <select id="exam-time">
+        <option value="5">5 Minutes (20 Questions)</option>
+        <option value="10">10 Minutes (40 Questions)</option>
+        <option value="15">15 Minutes (60 Questions)</option>
+        <option value="20">20 Minutes (80 Questions)</option>
+    </select>
 
-        <div style="display:flex; flex-direction:column; gap:15px;">
+    <button id="send-otp-btn" onclick="sendOTP()">Send OTP</button>
 
-            <input id="name" type="text" placeholder="Full Name" />
+    <div id="otp-section" style="display:none;">
+        <input id="otp-input" type="text" placeholder="Enter OTP">
+        <button onclick="verifyOTPAndStart()">Start Exam</button>
+    </div>
+</div>
 
-            <input id="email" type="email" placeholder="Email Address (for OTP)" />
-
-            <select id="class">
-                <option value="">Select Your Course</option>
-                <option value="12th">12th Standard</option>
-                <option value="BCA">BCA</option>
-                <option value="BTech">B.Tech</option>
-                <option value="MCA">MCA</option>
-                <option value="Other">Other Higher Education</option>
-            </select>
-
-            <select id="exam-time">
-                <option value="5">5 Minutes (20 Questions)</option>
-                <option value="10">10 Minutes (40 Questions)</option>
-                <option value="15">15 Minutes (60 Questions)</option>
-                <option value="20">20 Minutes (80 Questions)</option>
-            </select>
-
-            <button id="send-otp-btn" onclick="sendOTP()">Send OTP</button>
-
-            <div id="otp-section" style="display:none;">
-                <input id="otp-input" type="text" placeholder="Enter 6-Digit OTP" />
-                <button onclick="verifyOTPAndStart()">Verify & Start Exam</button>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- SCRIPT -->
-    <script>
-        // Auto redirect if already logged in
-        if (localStorage.getItem("studentEmail")) {
-            window.location.href = "dashboard.html";
-        }
-
-        // EmailJS init
-        (function () {
-            emailjs.init("dNirsJkwieq53_oF4");
-        })();
-    </script>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
