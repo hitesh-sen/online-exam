@@ -73,18 +73,25 @@ let questions = [];
 let userChoices = [];
 let index = 0;
 
-// --- FETCH ---
-fetch(API_URL)
+// --- FETCH QUESTIONS (Updated for Secure Backend) ---
+const classForTest = localStorage.getItem("studentClass");
+
+fetch(`${API_URL}?action=getTest&className=${encodeURIComponent(classForTest)}`)
 .then(res => res.json())
 .then(data => {
+    if (data.error || !data.length) {
+        document.getElementById("question").innerText = "❌ No questions found for " + classForTest;
+        return;
+    }
     // Randomize and limit
     questions = data.sort(() => Math.random() - 0.5).slice(0, limit);
     document.getElementById("next-btn").style.display = "block";
     loadQuestion();
     startTimer();
 })
-.catch(() => {
-    document.getElementById("question").innerText = "❌ Error loading test. Please check internet!";
+.catch(err => {
+    console.error("Fetch Error:", err);
+    document.getElementById("question").innerText = "❌ Connection Error! Check Script URL.";
 });
 
 function loadQuestion() {
@@ -168,4 +175,5 @@ function startTimer() {
 </script>
 </body>
 </html>
+
 
