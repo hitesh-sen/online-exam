@@ -39,29 +39,35 @@
     </div>
 
     <script>
-       window.onload = function () {
-    const raw = localStorage.getItem("reviewData");
-    if(!raw) return;
-    const data = JSON.parse(raw);
+      window.onload = function () {
+    const name = localStorage.getItem("studentName") || "Student";
+    const cls = localStorage.getItem("studentClass") || "BCA";
+    const rawData = localStorage.getItem("reviewData");
     
+    if (!rawData) return;
+    const reviewData = JSON.parse(rawData);
+
     let score = 0;
-    data.forEach(item => { if(item.selected === item.correct) score++; }); // Purana Logic
+    reviewData.forEach(item => {
+        if (item.selected === item.correct) score++;
+    });
 
-    document.getElementById("display-score").innerText = `${score} / ${data.length}`;
+    document.getElementById("display-score").innerText = `${score} / ${reviewData.length}`;
 
-    // SYNC: Action 'saveResult'
-    fetch(`${API_URL}?action=saveResult`, {
+    // --- SAVE TO GOOGLE SHEET (Sheet1 Logic) ---
+    fetch(API_URL, {
         method: "POST",
         mode: "no-cors",
         body: JSON.stringify({
-            name: localStorage.getItem("studentName"),
-            cls: localStorage.getItem("studentClass"),
+            name: name,
+            cls: cls,
             score: score,
-            total: data.length
+            total: reviewData.length
         })
-    });
+    }).then(() => console.log("Result Synced"));
 };
     </script>
 </body>
 </html>
+
 
