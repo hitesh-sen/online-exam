@@ -100,15 +100,53 @@ button:hover { background: #1a9e4b; transform: translateY(-2px); }
 }
 .option-card:hover { border-color:#22c55e; }
 
-/* RESULT PAGE */
-.result-score {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin: 15px 0;
+/* ================= RESULT PAGE ================= */
+
+.result-box,
+.login-box {
+    animation: fadeIn 0.4s ease-in-out;
 }
 
-.pass { color:#22c55e; }
-.fail { color:#ef4444; }
+.score {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 10px 0 15px;
+    color: #22c55e;
+}
+
+/* Answer Review Cards */
+.review-card {
+    text-align: left;
+    background: #334155;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border-left: 6px solid #ef4444;
+    color: #f8fafc;
+    line-height: 1.5;
+}
+
+.review-card.correct {
+    border-left-color: #22c55e;
+    background: #1e293b;
+}
+
+.review-card p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+}
+
+/* Result PASS/FAIL */
+#status-msg {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+/* Result Page Button */
+.result-box button,
+.login-box button {
+    margin-top: 25px;
+}
 
 /* Dashboard */
 .dashboard-box {
@@ -120,3 +158,4 @@ button:hover { background: #1a9e4b; transform: translateY(-2px); }
 @media (max-width:480px) {
     body { padding-top:70px; }
 }
+
