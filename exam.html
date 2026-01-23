@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCA/BTech Quiz Portal | Bothverse</title>
+    <title>Online Exam | Bothverse</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Aapki First UI ki Styling */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        /* Aapki Pehli Wali Simple UI */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); sticky; top: 0; z-index: 100; }
         #timer { font-size: 1.4rem; font-weight: bold; color: #ef4444; background: #fee2e2; padding: 5px 15px; border-radius: 20px; }
         .option-card { display: block; margin: 12px 0; padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; cursor: pointer; text-align: left; transition: 0.3s; }
         .option-card:hover { border-color: #6366f1; background: #f8fafc; }
@@ -18,19 +18,14 @@
 
 <div class="top-bar">
     <div>
-        <b id="student" style="color: #1e293b;"></b>
-        <button onclick="confirmExit()" style="margin-left:10px; padding:5px 12px; background:#ef4444; color:white; border:none; border-radius:5px; cursor:pointer;">Exit</button>
+        <b id="student"></b>
+        <button onclick="location.href='index.html'" style="margin-left:10px; padding:5px 12px; background:red; color:white; border:none; border-radius:5px; cursor:pointer;">Exit</button>
     </div>
     <span id="timer">00:00</span>
 </div>
 
 <div class="login-box" style="max-width:650px; margin:40px auto; padding:30px; border-radius:15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:#64748b; font-weight: bold;">
-        <span id="q-count">Loading Exam...</span>
-        <span id="tab-warnings" style="color:#f59e0b;"></span>
-    </div>
-    <h2 id="question" style="font-size: 1.3rem; line-height: 1.5; color:#1e293b; margin-bottom:20px;">Please wait...</h2>
-    
+    <h2 id="question" style="font-size: 1.3rem; color:#1e293b; margin-bottom:20px;">Loading Questions...</h2>
     <div id="options-container"></div>
 
     <div style="display: flex; gap: 15px; margin-top: 30px;">
@@ -40,22 +35,8 @@
 </div>
 
 <script>
-// Yahan apna Google Script URL dalein
 const API_URL = "https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec";
 
-// --- SECURITY: ANTI-CHEAT ---
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.onkeydown = e => { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) return false; };
-
-let tabWarnings = 0;
-window.onblur = () => {
-    tabWarnings++;
-    document.getElementById("tab-warnings").innerText = `⚠️ Warning: ${tabWarnings}/3`;
-    if(tabWarnings >= 3) { alert("Limit reached! Exam submitting..."); finish(); }
-    else { alert("Don't switch tabs! This is a secure exam."); }
-};
-
-// --- DATA CONFIG ---
 const name = localStorage.getItem("studentName") || "Student";
 const cls = localStorage.getItem("studentClass") || "BCA";
 const savedTime = localStorage.getItem("examTime") || "10";
@@ -65,25 +46,20 @@ let questions = [];
 let userChoices = [];
 let index = 0;
 
-// --- FETCH QUESTIONS (As per your row[0]-row[6] logic) ---
+// --- FETCH (Aapka row[0]-row[6] wala logic) ---
 fetch(API_URL)
 .then(res => res.json())
 .then(data => {
-    // Shuffling questions for production
-    questions = data.sort(() => Math.random() - 0.5); 
+    questions = data; // App Script se JSON array mil raha hai
     document.getElementById("next-btn").style.display = "block";
     loadQuestion();
     startTimer();
 })
-.catch(err => {
-    document.getElementById("question").innerText = "❌ Connection Error! Check Script URL.";
-});
+.catch(err => { document.getElementById("question").innerText = "Error loading questions!"; });
 
 function loadQuestion() {
     const q = questions[index];
-    document.getElementById("q-count").innerText = `Question ${index + 1} of ${questions.length}`;
-    document.getElementById("question").innerText = q.question;
-    
+    document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
     const container = document.getElementById("options-container");
     container.innerHTML = "";
 
@@ -98,7 +74,6 @@ function loadQuestion() {
 
     document.getElementById("prev-btn").style.display = index === 0 ? "none" : "block";
     document.getElementById("next-btn").innerText = index === questions.length - 1 ? "Submit Exam" : "Next Question";
-    document.getElementById("next-btn").style.background = index === questions.length - 1 ? "#22c55e" : "#6366f1";
 }
 
 function nextQuestion() {
@@ -116,7 +91,7 @@ function nextQuestion() {
         index++;
         loadQuestion();
     } else {
-        if(confirm("Are you sure you want to submit?")) finish();
+        finish();
     }
 }
 
@@ -130,15 +105,11 @@ function finish() {
 function startTimer() {
     let sec = parseInt(savedTime) * 60;
     const itv = setInterval(() => {
-        let m = Math.floor(sec / 60);
-        let s = sec % 60;
-        document.getElementById("timer").innerText = `${m}:${s < 10 ? "0"+s : s}`;
+        let m = Math.floor(sec/60), s = sec%60;
+        document.getElementById("timer").innerText = `${m}:${s < 10 ? '0'+s : s}`;
         if (sec-- <= 0) { clearInterval(itv); finish(); }
     }, 1000);
 }
-
-function confirmExit() { if(confirm("Exit exam? Progress will be lost.")) window.location.href = 'index.html'; }
 </script>
 </body>
 </html>
-
