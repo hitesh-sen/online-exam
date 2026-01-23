@@ -3,18 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Exam Result</title>
+<title>Exam Result | Bothverse Academy</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="light">
 
-<div class="card">
+<div class="login-box" style="max-width:800px;">
     <h1>Your Scorecard</h1>
     <p id="student-meta"></p>
-    <div class="result-score" id="display-score">0 / 0</div>
-    <div id="status-msg"></div>
-    <button onclick="goDashboard()">Back to Dashboard</button>
+    <div class="score" id="display-score">0 / 0</div>
+    <div id="status-msg" style="margin-bottom:20px;font-weight:bold;"></div>
+
+    <h2>Answer Review</h2>
+    <div id="review-container"></div>
+
+    <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
 </div>
 
 <script>
@@ -33,32 +37,43 @@ window.onload = function () {
 
     let score = 0;
     const total = reviewData.length;
-    reviewData.forEach(q => { if(q.selected === q.correct) score++; });
+
+    const container = document.getElementById("review-container");
+
+    reviewData.forEach((item, i) => {
+        const isCorrect = item.selected === item.correct;
+        if (isCorrect) score++;
+
+        container.innerHTML += `
+            <div class="review-card ${isCorrect ? 'correct' : ''}">
+                <p><strong>Q${i+1}:</strong> ${item.question}</p>
+                <p>Your Answer: <b>${item.options[item.selected]}</b></p>
+                <p>Correct Answer: <b>${item.options[item.correct]}</b></p>
+            </div>
+        `;
+    });
 
     document.getElementById("display-score").innerText = `${score} / ${total}`;
-
-    const percent = (score/total)*100;
     document.getElementById("status-msg").innerHTML =
-        percent >= 50
-        ? "<div class='pass'>RESULT: PASS 🎉</div>"
-        : "<div class='fail'>RESULT: FAIL ❌</div>";
+        (score / total) * 100 >= 50
+        ? "<span style='color:green'>RESULT: PASS</span>"
+        : "<span style='color:red'>RESULT: FAIL</span>";
 
     localStorage.setItem("lastExamScore", `${score} / ${total}`);
 
+    // SEND RESULT TO GOOGLE SHEET
     fetch("https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec", {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({name, cls, score, total}),
-        mode:"no-cors"
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: name,
+            cls: cls,
+            score: score,
+            total: total
+        })
     });
 };
-
-function goDashboard() {
-    window.location.href = "dashboard.html";
-}
 </script>
 
 </body>
 </html>
-
-
