@@ -5,6 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Exam Result | Bothverse Academy</title>
 <link rel="stylesheet" href="style.css">
+
+<style>
+.result-box {
+    max-width: 600px;
+    margin: 100px auto 40px;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.result-box h1 {
+    margin-bottom: 10px;
+}
+
+#student-meta {
+    color: #475569;
+    margin-bottom: 20px;
+}
+
+.score {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 15px 0;
+    color: #1e293b;
+}
+
+#status-msg {
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+</style>
 </head>
 
 <body class="light">
@@ -39,10 +73,10 @@ window.onload = function () {
     document.getElementById("display-score").innerText = `${score} / ${total}`;
     document.getElementById("status-msg").innerHTML =
         (score / total) * 100 >= 50
-        ? "<span style='color:green'>RESULT: PASS</span>"
-        : "<span style='color:red'>RESULT: FAIL</span>";
+        ? "<span style='color:#16a34a'>RESULT: PASS 🎉</span>"
+        : "<span style='color:#dc2626'>RESULT: FAIL ❌</span>";
 
-    // ✅ CORRECT Google Sheet Sync
+    // Google Sheet Sync
     const scriptURL = "https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec";
 
     fetch(scriptURL, {
