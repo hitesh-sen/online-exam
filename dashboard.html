@@ -2,68 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .dashboard-container { max-width: 500px; margin: 50px auto; padding: 20px; text-align: center; background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .user-info { margin: 20px 0; padding: 15px; background: #f8fafc; border-radius: 10px; border-left: 5px solid #22c55e; }
-        
-        /* Last Score Box Style */
-        .score-badge { 
-            margin: 15px 0; padding: 10px; background: #eff6ff; border-radius: 8px; 
-            border: 1px dashed #3b82f6; display: none; /* Default hidden */
-        }
 
-        .btn-start { width: 100%; padding: 15px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-bottom: 10px; }
-        .btn-logout { width: 100%; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    <!-- Responsive -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <title>Student Dashboard | Online IT Quiz Platform</title>
+    <meta name="description" content="Student dashboard for BCA, BTech and MCA online quizzes. View last exam score and start a new IT practice test." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://hitesh-sen.github.io/online-exam/dashboard.html" />
+
+    <!-- Open Graph (Sharing) -->
+    <meta property="og:title" content="Student Dashboard | Online IT Quiz Platform" />
+    <meta property="og:description" content="Access your dashboard to start online IT quizzes and view your last exam score." />
+    <meta property="og:url" content="https://hitesh-sen.github.io/online-exam/dashboard.html" />
+    <meta property="og:type" content="website" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .dashboard-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 5px solid #22c55e;
+        }
+        .score-badge {
+            margin: 15px 0;
+            padding: 10px;
+            background: #eff6ff;
+            border-radius: 8px;
+            border: 1px dashed #3b82f6;
+            display: none;
+        }
+        .btn-start {
+            width: 100%;
+            padding: 15px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .btn-logout {
+            width: 100%;
+            padding: 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
     </style>
 </head>
-<body class="light">
-    <div class="dashboard-container">
-        <h2>Student Dashboard</h2>
-        
-        <div class="user-info">
-            <h3 id="display-name">Loading...</h3>
-            <p>Class: <span id="display-class">-</span></p>
-            <p>Email: <span id="display-email">-</span></p>
-        </div>
 
-        <div id="last-score-container" class="score-badge">
+<body class="light">
+
+    <!-- MAIN CONTENT -->
+    <main class="dashboard-container">
+
+        <h1>Student Dashboard</h1>
+
+        <!-- Static text for SEO -->
+        <p style="font-size: 0.95rem; color:#475569;">
+            This dashboard is designed for IT students (BCA, BTech, MCA) to take online quizzes
+            and track their latest exam scores.
+        </p>
+
+        <section class="user-info">
+            <h3 id="display-name">Loading...</h3>
+            <p>Course: <span id="display-class">-</span></p>
+            <p>Email: <span id="display-email">-</span></p>
+        </section>
+
+        <section id="last-score-container" class="score-badge">
             <p style="margin: 0; color: #1e40af; font-weight: bold;">
                 Last Exam Score: <span id="last-score-val">0 / 0</span>
             </p>
-        </div>
+        </section>
 
-        <div style="margin-bottom: 20px; text-align: left;">
-            <label>Select Exam Duration:</label>
+        <section style="margin-bottom: 20px; text-align: left;">
+            <label for="exam-time"><strong>Select Exam Duration</strong></label>
             <select id="exam-time" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px;">
                 <option value="5">5 Minutes (20 Questions)</option>
                 <option value="10">10 Minutes (40 Questions)</option>
                 <option value="15">15 Minutes (60 Questions)</option>
                 <option value="20">20 Minutes (80 Questions)</option>
             </select>
-        </div>
+        </section>
 
         <button class="btn-start" onclick="startExam()">Start New Exam 🚀</button>
         <button class="btn-logout" onclick="logout()">Logout / Change Account</button>
-    </div>
 
+    </main>
+
+    <!-- SCRIPT -->
     <script>
         window.onload = function() {
             const name = localStorage.getItem("studentName");
             const cls = localStorage.getItem("studentClass");
             const email = localStorage.getItem("studentEmail");
-            const score = localStorage.getItem("lastExamScore"); //
+            const score = localStorage.getItem("lastExamScore");
 
-            // Score dikhane ka logic
             if (score) {
                 document.getElementById("last-score-container").style.display = "block";
                 document.getElementById("last-score-val").innerText = score;
             }
 
             if (!name) {
-                window.location.href = "index.html"; 
+                window.location.href = "index.html";
             } else {
                 document.getElementById("display-name").innerText = "Welcome, " + name;
                 document.getElementById("display-class").innerText = cls;
@@ -73,16 +134,17 @@
 
         function startExam() {
             const time = document.getElementById("exam-time").value;
-            localStorage.setItem("examTime", time); 
+            localStorage.setItem("examTime", time);
             window.location.href = "exam.html";
         }
 
         function logout() {
-            if(confirm("Are you sure you want to logout?")) {
-                localStorage.clear(); //
+            if (confirm("Are you sure you want to logout?")) {
+                localStorage.clear();
                 window.location.href = "index.html";
             }
         }
     </script>
+
 </body>
 </html>
