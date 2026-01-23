@@ -45,7 +45,7 @@ window.onload = function () {
 
     localStorage.setItem("lastExamScore", `${score} / ${total}`);
 
-    fetch("YOUR_GOOGLE_SCRIPT_URL", {
+    fetch("https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({name, cls, score, total}),
@@ -60,3 +60,4 @@ function goDashboard() {
 
 </body>
 </html>
+
