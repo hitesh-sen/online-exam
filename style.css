@@ -210,3 +210,26 @@ button:hover { background: #1a9e4b; transform: translateY(-2px); }
     max-width:700px;
     width:95%;
 }
+
+/* ===== DASHBOARD FIX ===== */
+.dashboard-container {
+    background: #ffffff;
+    color: #1e293b; /* Dark readable text */
+}
+
+.dashboard-container h1,
+.dashboard-container h3,
+.dashboard-container p,
+.dashboard-container label {
+    color: #1e293b;
+}
+
+.user-info {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.score-badge {
+    background: #eff6ff;
+    color: #1e293b;
+}
