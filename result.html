@@ -27,7 +27,6 @@
     <div id="answer-review" class="answer-review"></div>
 </div>
 
-
 <script>
 window.onload = function () {
     const name = localStorage.getItem("studentName") || "Student";
@@ -35,29 +34,21 @@ window.onload = function () {
     const rawData = localStorage.getItem("reviewData");
 
     if (!rawData) {
-        document.body.innerHTML = "<h2>No Data Found!</h2>";
+        document.getElementById("display-score").innerText = "0 / 0";
+        document.getElementById("status-msg").innerHTML =
+            "<span style='color:red'>No exam data found</span>";
         return;
     }
 
     const reviewData = JSON.parse(rawData);
+
     document.getElementById("student-meta").innerText = `${name} | Class: ${cls}`;
 
     let score = 0;
     const total = reviewData.length;
 
-    const container = document.getElementById("review-container");
-
-    reviewData.forEach((item, i) => {
-        const isCorrect = item.selected === item.correct;
-        if (isCorrect) score++;
-
-        container.innerHTML += `
-            <div class="review-card ${isCorrect ? 'correct' : ''}">
-                <p><strong>Q${i+1}:</strong> ${item.question}</p>
-                <p>Your Answer: <b>${item.options[item.selected]}</b></p>
-                <p>Correct Answer: <b>${item.options[item.correct]}</b></p>
-            </div>
-        `;
+    reviewData.forEach(item => {
+        if (item.selected === item.correct) score++;
     });
 
     document.getElementById("display-score").innerText = `${score} / ${total}`;
@@ -65,24 +56,12 @@ window.onload = function () {
         (score / total) * 100 >= 50
         ? "<span style='color:green'>RESULT: PASS</span>"
         : "<span style='color:red'>RESULT: FAIL</span>";
-
-    localStorage.setItem("lastExamScore", `${score} / ${total}`);
-
-    // SEND RESULT TO GOOGLE SHEET
-    fetch("https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            name: name,
-            cls: cls,
-            score: score,
-            total: total
-        })
-    });
 };
 </script>
 
+
 </body>
 </html>
+
 
 
