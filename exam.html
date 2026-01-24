@@ -136,16 +136,18 @@ function loadQuestion(){
 }
 
 /* ===== NEXT ===== */
-function nextQuestion(){
-    const sel = document.querySelector("input[name='opt']:checked");
-    if(!sel) return alert("Please select an answer!");
+userChoices[index] = {
+    question: questions[index].question || "",
+    selected: sel.value,
+    correct: questions[index].correct || "",
+    options: {
+        a: questions[index].a || "",
+        b: questions[index].b || "",
+        c: questions[index].c || "",
+        d: questions[index].d || ""
+    }
+};
 
-    userChoices[index] = {
-        question:questions[index].question,
-        selected:sel.value,
-        correct:questions[index].correct,
-        options:{a:questions[index].a,b:questions[index].b,c:questions[index].c,d:questions[index].d}
-    };
 
     if(index < questions.length-1){
         index++; loadQuestion();
@@ -160,11 +162,22 @@ function nextQuestion(){
 function prevQuestion(){ if(index>0){ index--; loadQuestion(); } }
 
 /* ===== FINISH ===== */
-function finish(){
+function finish() {
     isSubmitting = true;
-    localStorage.setItem("reviewData", JSON.stringify(userChoices));
+
+    // Remove empty unanswered slots
+    const finalData = userChoices.filter(q => q && q.selected);
+
+    if(finalData.length === 0){
+        alert("Error saving result. Please try again.");
+        isSubmitting = false;
+        return;
+    }
+
+    localStorage.setItem("reviewData", JSON.stringify(finalData));
     window.location.href = "result.html";
 }
+
 
 /* ===== TIMER ===== */
 function startTimer(){
@@ -179,4 +192,5 @@ function startTimer(){
 </script>
 </body>
 </html>
+
 
