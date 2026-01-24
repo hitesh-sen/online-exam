@@ -3,157 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Online Exam Portal | Bothverse Academy</title>
 <link rel="stylesheet" href="style.css">
+
 <style>
-  /* 1. HOVER FIX: Text nazar aana chahiye */
-  .option-card { 
-      display:block; margin:10px 0; padding:12px; border:1px solid #ccc; 
-      border-radius:8px; cursor:pointer; text-align:left; transition: 0.2s;
-      background: #1e293b; color: white; /* Dark theme jaisa screenshot mein hai */
-  }
-  .option-card:hover { 
-      background: #334155 !important; /* Thoda light grey, white nahi! */
-      border-color: #22c55e !important;
-  }
-  #tab-warning-ui { color: #f59e0b; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; display: block; text-align: center; }
-  
-  /* Loading state ke liye buttons hide rakhna */
-  .hidden { display: none !important; }
+.option-card { 
+    display:block; margin:10px 0; padding:12px; border:1px solid #334155; 
+    border-radius:8px; cursor:pointer; text-align:left; transition: 0.2s;
+    background:#1e293b; color:white;
+}
+.option-card:hover { 
+    background:#334155;
+    border-color:#22c55e;
+}
+#tab-warning-ui {
+    color:#f59e0b; font-weight:bold; font-size:0.9rem;
+    margin-bottom:10px; display:block; text-align:center;
+}
+.hidden { display:none !important; }
+
+.exam-container{
+    max-width:700px;
+    margin:100px auto 40px;
+    padding:20px;
+}
+.question-card{
+    background:#0f172a;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
 </style>
 </head>
 
 <body class="light">
 
 <div class="top-bar">
-    <h2 id="student-info">Student | Exam</h2>
-    <div id="timer">10:00</div>
+    <h2 id="student-info">Loading...</h2>
+    <div id="timer">00:00</div>
 </div>
 
 <div class="exam-container">
     <div class="question-card">
-        <h2 id="question-text">Loading question...</h2>
+        <span id="tab-warning-ui"></span>
+        <h2 id="question">Loading questions...</h2>
         <div id="options-container"></div>
-        <button onclick="nextQuestion()">Next Question</button>
+
+        <button id="prev-btn" onclick="prevQuestion()" class="hidden">Previous Question</button>
+        <button id="next-btn" onclick="nextQuestion()" class="hidden">Next Question</button>
     </div>
 </div>
-
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwEo40yBXFZUUn5V-U0xWzfxZc_jb-Fludqe43CN20BAs0TlB05yxngqn0Q37ERUYWgPw/exec";
 
-// --- SECURITY LOGIC (Fixed for Submit) ---
-let warnings = 0;
-let isSubmitting = false; // Flag to stop alerts during submission
-
-window.onblur = () => {
-    if(isSubmitting) return; // Agar submit ho raha hai toh alert mat dikhao
-    warnings++;
-    document.getElementById("tab-warning-ui").innerText = `⚠️ Tab Switches: ${warnings}/3`;
-    if(warnings >= 3) { finish(); }
-    else { alert("Warning: Do not switch tabs!"); }
-};
-
-const savedTime = localStorage.getItem("examTime") || "5";
-const time = parseInt(savedTime);
+/* ===== USER INFO ===== */
 const name = localStorage.getItem("studentName") || "Guest";
 const cls = localStorage.getItem("studentClass") || "-";
-document.getElementById("student").innerText = `${name} | ${cls}`;
+document.getElementById("student-info").innerText = `${name} | ${cls}`;
 
-const limitMapping = { 5: 20, 10: 40, 15: 60, 20: 80 };
-const limit = limitMapping[time] || 20;
+/* ===== TIMER SETUP ===== */
+const savedTime = parseInt(localStorage.getItem("examTime") || "5");
+const limitMapping = {5:20,10:40,15:60,20:80};
+const limit = limitMapping[savedTime] || 20;
 
+/* ===== SECURITY TAB SWITCH ===== */
+let warnings = 0;
+let isSubmitting = false;
+
+window.onblur = () => {
+    if(isSubmitting) return;
+    warnings++;
+    document.getElementById("tab-warning-ui").innerText = `⚠️ Tab Switches: ${warnings}/3`;
+    if(warnings >= 3) finish();
+    else alert("Warning: Do not switch tabs!");
+};
+
+/* ===== QUESTION LOGIC ===== */
 let questions = [];
 let userChoices = [];
 let index = 0;
 
 fetch(API_URL)
-.then(res => res.json())
+.then(res => {
+    if(!res.ok) throw new Error("Network error");
+    return res.json();
+})
 .then(data => {
-  questions = data.sort(() => Math.random() - 0.5).slice(0, limit);
-  // Questions load hone ke baad hi buttons dikhao
-  document.getElementById("next-btn").classList.remove("hidden");
-  loadQuestion();
-  startTimer();
+    if(!data.length) throw new Error("No questions found");
+    questions = data.sort(()=>Math.random()-0.5).slice(0, limit);
+    document.getElementById("next-btn").classList.remove("hidden");
+    loadQuestion();
+    startTimer();
+})
+.catch(err => {
+    console.error(err);
+    document.getElementById("question").innerText = "⚠️ Failed to load questions.";
 });
 
-function loadQuestion() {
-  const q = questions[index];
-  document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
-  const container = document.getElementById("options-container");
-  container.innerHTML = "";
+/* ===== LOAD QUESTION ===== */
+function loadQuestion(){
+    const q = questions[index];
+    document.getElementById("question").innerText = `Q${index+1}. ${q.question}`;
+    const container = document.getElementById("options-container");
+    container.innerHTML = "";
 
-  ["a","b","c","d"].forEach(opt => {
-    container.innerHTML += `
-      <label class="option-card">
-        <input type="radio" name="opt" value="${opt}" style="margin-right:10px;">
-        ${q[opt]}
-      </label>`;
-  });
+    ["a","b","c","d"].forEach(opt=>{
+        container.innerHTML += `
+        <label class="option-card">
+            <input type="radio" name="opt" value="${opt}"> ${q[opt]}
+        </label>`;
+    });
 
-  if (userChoices[index]) {
-    const radio = document.querySelector(`input[value="${userChoices[index].selected}"]`);
-    if (radio) radio.checked = true;
-  }
-
-  // 2. PREVIOUS BUTTON FIX: Index 0 par hide rakho
-  const prevBtn = document.getElementById("prev-btn");
-  if (index === 0) prevBtn.classList.add("hidden");
-  else prevBtn.classList.remove("hidden");
-
-  document.getElementById("next-btn").innerText =
-    index === questions.length - 1 ? "Submit Exam" : "Next Question";
-}
-
-function nextQuestion() {
-  const sel = document.querySelector("input[name='opt']:checked");
-  if (!sel) return alert("Please select an answer!");
-
-  userChoices[index] = {
-    question: questions[index].question,
-    selected: sel.value,
-    correct: questions[index].correct,
-    options: { a: questions[index].a, b: questions[index].b, c: questions[index].c, d: questions[index].d }
-  };
-
-  if (index < questions.length - 1) {
-    index++;
-    loadQuestion();
-  } else {
-    // 3. SUBMIT FIX: Confirmation se pehle flag on karo
-    isSubmitting = true; 
-    if(confirm("Are you sure you want to submit the exam?")) {
-        finish();
-    } else {
-        isSubmitting = false; // Agar cancel kiya toh wapas security on
+    if(userChoices[index]){
+        const radio = document.querySelector(`input[value="${userChoices[index].selected}"]`);
+        if(radio) radio.checked = true;
     }
-  }
+
+    const prevBtn = document.getElementById("prev-btn");
+    index===0 ? prevBtn.classList.add("hidden") : prevBtn.classList.remove("hidden");
+
+    document.getElementById("next-btn").innerText =
+        index === questions.length-1 ? "Submit Exam" : "Next Question";
 }
 
-function prevQuestion() {
-  if (index > 0) { index--; loadQuestion(); }
+/* ===== NEXT ===== */
+function nextQuestion(){
+    const sel = document.querySelector("input[name='opt']:checked");
+    if(!sel) return alert("Please select an answer!");
+
+    userChoices[index] = {
+        question:questions[index].question,
+        selected:sel.value,
+        correct:questions[index].correct,
+        options:{a:questions[index].a,b:questions[index].b,c:questions[index].c,d:questions[index].d}
+    };
+
+    if(index < questions.length-1){
+        index++; loadQuestion();
+    } else {
+        isSubmitting = true;
+        if(confirm("Submit exam?")) finish();
+        else isSubmitting = false;
+    }
 }
 
-function finish() {
-  isSubmitting = true; 
-  localStorage.setItem("reviewData", JSON.stringify(userChoices));
-  window.location.href = "result.html";
+/* ===== PREVIOUS ===== */
+function prevQuestion(){ if(index>0){ index--; loadQuestion(); } }
+
+/* ===== FINISH ===== */
+function finish(){
+    isSubmitting = true;
+    localStorage.setItem("reviewData", JSON.stringify(userChoices));
+    window.location.href = "result.html";
 }
 
-function startTimer() {
-  let sec = time * 60;
-  const timerInt = setInterval(() => {
-    let m = Math.floor(sec / 60);
-    let s = sec % 60;
-    document.getElementById("timer").innerText = `${m}:${s < 10 ? "0"+s : s}`;
-    if (sec-- <= 0) { clearInterval(timerInt); finish(); }
-  }, 1000);
+/* ===== TIMER ===== */
+function startTimer(){
+    let sec = savedTime * 60;
+    const timerInt = setInterval(()=>{
+        let m = Math.floor(sec/60);
+        let s = sec%60;
+        document.getElementById("timer").innerText = `${m}:${s<10?"0"+s:s}`;
+        if(sec-- <=0){ clearInterval(timerInt); finish(); }
+    },1000);
 }
 </script>
 </body>
 </html>
-
-
-
-
-
