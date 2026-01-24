@@ -63,10 +63,17 @@ const name = localStorage.getItem("studentName") || "Guest";
 const cls = localStorage.getItem("studentClass") || "-";
 document.getElementById("student-info").innerText = `${name} | ${cls}`;
 
-/* ===== TIMER SETUP ===== */
-const savedTime = parseInt(localStorage.getItem("examTime") || "5");
-const limitMapping = {5:20,10:40,15:60,20:80};
-const limit = limitMapping[savedTime] || 20;
+// ===== EXAM TIME (Single Source of Truth) =====
+const examMinutes = Number(localStorage.getItem("examTime")) || 5;
+
+const limitMapping = {
+    5: 20,
+    10: 40,
+    15: 60,
+    20: 80
+};
+
+const limit = limitMapping[examMinutes] || 20;
 
 /* ===== SECURITY TAB SWITCH ===== */
 let warnings = 0;
@@ -161,7 +168,7 @@ function finish(){
 
 /* ===== TIMER ===== */
 function startTimer(){
-    let sec = savedTime * 60;
+    let sec = examMinutes * 60;  
     const timerInt = setInterval(()=>{
         let m = Math.floor(sec/60);
         let s = sec%60;
@@ -172,3 +179,4 @@ function startTimer(){
 </script>
 </body>
 </html>
+
