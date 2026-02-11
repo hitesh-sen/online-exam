@@ -135,20 +135,35 @@ function loadQuestion(){
         index === questions.length-1 ? "Submit Exam" : "Next Question";
 }
 
-/* ===== NEXT ===== */
-userChoices[index] = {
-    question: questions[index].question || "",
-    selected: sel.value,
-    correct: questions[index].correct || "",
-    options: {
-        a: questions[index].a || "",
-        b: questions[index].b || "",
-        c: questions[index].c || "",
-        d: questions[index].d || ""
+    function nextQuestion() {
+    const sel = document.querySelector('input[name="opt"]:checked');
+
+    if (!sel) {
+        alert("Please select an option");
+        return;
     }
-};
 
+    userChoices[index] = {
+        question: questions[index].question,
+        selected: sel.value,
+        correct: questions[index].correct,
+        options: {
+            a: questions[index].a,
+            b: questions[index].b,
+            c: questions[index].c,
+            d: questions[index].d
+        }
+    };
 
+    if (index < questions.length - 1) {
+        index++;
+        loadQuestion();
+        } else {
+        isSubmitting = true;
+        if (confirm("Submit exam?")) finish();
+        else isSubmitting = false;
+        }
+    }
     if(index < questions.length-1){
         index++; loadQuestion();
     } else {
@@ -192,5 +207,6 @@ function startTimer(){
 </script>
 </body>
 </html>
+
 
 
